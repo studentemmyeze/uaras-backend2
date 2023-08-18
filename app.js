@@ -476,7 +476,7 @@ async function updateStudentRecord_Registrations(type,tableName, record) {
 async function matchUTMECandidateHashSaved(type,tableName, toSendSample) {
     try {
         // reg_num, department, school, student_type, recommendation, qualified
-        console.log('at saved::', toSendSample)
+        // console.log('at saved::', toSendSample)
         const r1 = await recordsFromATableGrab(type,toSendSample.reg_num, tableName)
         if (r1.length > 0) {
             const newJSON =
@@ -2064,6 +2064,7 @@ async function onStudentsRecordSendSave(req, res) {
             // await waitForServerProcess(delays)
             const copyprojectManagers = projectManagers
             const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)// const waitanswer = await waitForServerProcess(delays)
+            console.log('total number sent in this batch::', copyprojectManagers.length)
         }
         else{itemNo = itemNo + 1}
         console.log("COUNT OF PM::", itemNo)
@@ -3073,7 +3074,7 @@ async function getStudentRegistrationInfo(ii,regNo, type, projectM) {
                         }
                         else {
                             console.log("..error pushing to projectmanagers")
-                            return error
+                            return null
                         }
 
                         // return toSend2
