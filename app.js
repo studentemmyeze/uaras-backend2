@@ -474,40 +474,44 @@ async function updateStudentRecord_Registrations(type,tableName, record) {
 }
 
 async function matchUTMECandidateHashSaved(type,tableName, toSendSample) {
-
-    // reg_num, department, school, student_type, recommendation, qualified
-    const r1 = await recordsFromATableGrab(type,toSendSample.reg_num, tableName)
-    if (r1.length > 0) {
-        const newJSON =
-            {reg_num: toSendSample.reg_num , department: toSendSample.department,
-
-                school: (toSendSample.school ? (
-                    toSendSample.phone ==="1" ? "UMUNZE" :
-                        (toSendSample.phone ==="2" ? "AUCHI":(toSendSample.phone ==="3" ? "POPE JOHN" : "ESCET"))) : 'UNIZIK' ) ,
-                student_type: toSendSample.student_type,
-                recommendation: toSendSample.recommendation, qualified: toSendSample.qualified}
-
-        const h1 = crypto.createHash('sha1').update(`${JSON.stringify(newJSON)}`).digest('hex')
-        const h2 = crypto.createHash('sha1').update(`${JSON.stringify(r1[0])}`).digest('hex')
-        // console.log("r1 from SavedTable::",r1[0])
-        // console.log("newJSON from MainUTMETable",newJSON)
-
-        if (h1 !== h2) {
-            console.log("not equal")
-            updateStudentRecordSave(type,tableName,newJSON)
-        }
+    try {
         // reg_num, department, school, student_type, recommendation, qualified
+        const r1 = await recordsFromATableGrab(type,toSendSample.reg_num, tableName)
+        if (r1.length > 0) {
+            const newJSON =
+                {reg_num: toSendSample.reg_num , department: toSendSample.department,
+
+                    school: (toSendSample.school ? (
+                        toSendSample.phone ==="1" ? "UMUNZE" :
+                            (toSendSample.phone ==="2" ? "AUCHI":(toSendSample.phone ==="3" ? "POPE JOHN" : "ESCET"))) : 'UNIZIK' ) ,
+                    student_type: toSendSample.student_type,
+                    recommendation: toSendSample.recommendation, qualified: toSendSample.qualified}
+
+            const h1 = crypto.createHash('sha1').update(`${JSON.stringify(newJSON)}`).digest('hex')
+            const h2 = crypto.createHash('sha1').update(`${JSON.stringify(r1[0])}`).digest('hex')
+            // console.log("r1 from SavedTable::",r1[0])
+            // console.log("newJSON from MainUTMETable",newJSON)
+
+            if (h1 !== h2) {
+                console.log("not equal")
+                await updateStudentRecordSave(type,tableName,newJSON)
+            }
+            // reg_num, department, school, student_type, recommendation, qualified
+
+        }
+        else {
+            try {
+                await addRecord2(type,tableName,toSendSample)
+                updatedData[type].push(toSendSample.reg_num)
+            } catch (error) {
+                dataNotProcessed[type].push(toSendSample.reg_num)
+                console.log("error saving UTME status")
+            }
+        }
 
     }
-    else {
-        try {
-            await addRecord2(type,tableName,toSendSample)
-            updatedData[type].push(toSendSample.reg_num)
-        } catch (error) {
-            dataNotProcessed[type].push(toSendSample.reg_num)
-            console.log("error saving UTME status")
-        }
-    }
+    catch {console.log('error saving this', toSendSample)}
+
 
 }
 
