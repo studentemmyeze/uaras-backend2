@@ -2039,7 +2039,7 @@ async function onStudentsRecordSendSave(req, res) {
         const aRegNo = regNoList[i]['reg_num']
         batchCondition[1] = i
         const response = await requestWithRetry (i,aRegNo,type, projectManagers)
-        // console.log("this is projectManagers", projectManagers)
+        console.log("this is projectManagers", projectManagers)
         await saveDetailsOfPush('SAVEUTMESTATUS', projectManagers[itemNo])
         if (i % batchNo === 0 && i !== 0) {
             currentBatch += 1
@@ -2931,7 +2931,7 @@ async function getStudentRegistrationInfo(ii,regNo, type, projectM) {
     // else {
     let toSend2 = {}
     let type2 = 0
-    r1 = await recordsFromATableGrab(type,regNo, mainTableName[type],true)
+    const r1 = await recordsFromATableGrab(type,regNo, mainTableName[type],true)
     // console.log('...retrieved student record', r1)
     const toSend = r1.length < 1  ? undefined : r1
     if (type === "DE") {
