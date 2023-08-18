@@ -1990,6 +1990,7 @@ async function onStudentsRecordSendSave(req, res) {
     type = "UTME"
     let batchNo = 100;
     currentBatch = 0;
+    let itemNo = 0;
     var projectManagers = []
     var issuesBatches = []
     const start = req.query.start
@@ -2034,16 +2035,18 @@ async function onStudentsRecordSendSave(req, res) {
         batchCondition[1] = i
         const response = await requestWithRetry (i,aRegNo,type, projectManagers)
         // console.log("this is projectManagers", projectManagers)
-        await saveDetailsOfPush('SAVEUTMESTATUS', projectManagers[0])
+        await saveDetailsOfPush('SAVEUTMESTATUS', projectManagers[itemNo])
         if (i % batchNo == 0 && i != 0) {
             currentBatch += 1
             batchCondition[0] = currentBatch
 
             const copyprojectManagers = projectManagers
             projectManagers = []
+            itemNo = 0
             // await waitForServerProcess(delays)
 
             const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)
+            if (currentBatch === 1){console.log(projectManagers)}
             // issuesBatches = []
 
         }
@@ -2055,8 +2058,9 @@ async function onStudentsRecordSendSave(req, res) {
             const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)
             // const waitanswer = await waitForServerProcess(delays)
         }
-        console.log("COUNT OF PM::", projectManagers.length)
-        projectManagers = []
+        else{itemNo = itemNo + 1}
+        console.log("COUNT OF PM::", copyprojectManagers.length)
+        // projectManagers = []
         // console.log("this is i", i)
 
     }
