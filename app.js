@@ -1989,7 +1989,7 @@ app.route('/api/push-to-chuka-save').get(onStudentsRecordSendSave)
 async function onStudentsRecordSendSave(req, res) {
     type = "UTME"
     let batchNo = 100;
-    currentBatch = 0;
+    let currentBatch = 0;
     let itemNo = 0;
     var projectManagers = []
     var issuesBatches = []
@@ -2036,7 +2036,7 @@ async function onStudentsRecordSendSave(req, res) {
         const response = await requestWithRetry (i,aRegNo,type, projectManagers)
         // console.log("this is projectManagers", projectManagers)
         await saveDetailsOfPush('SAVEUTMESTATUS', projectManagers[itemNo])
-        if (i % batchNo == 0 && i != 0) {
+        if (i % batchNo === 0 && i !== 0) {
             currentBatch += 1
             batchCondition[0] = currentBatch
 
