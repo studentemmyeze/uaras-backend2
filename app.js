@@ -2046,7 +2046,10 @@ async function onStudentsRecordSendSave(req, res) {
             // await waitForServerProcess(delays)
 
             const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)
-            if (currentBatch === 1){console.log(projectManagers)}
+            if (currentBatch === 1){
+                console.log(copyprojectManagers);
+
+            }
             // issuesBatches = []
 
         }
