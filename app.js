@@ -2039,7 +2039,7 @@ async function onStudentsRecordSendSave(req, res) {
         const aRegNo = regNoList[i]['reg_num']
         batchCondition[1] = i
         const response = await requestWithRetry (i,aRegNo,type, projectManagers)
-        console.log("this is projectManagers", projectManagers)
+        // console.log("this is projectManagers", projectManagers)
         await saveDetailsOfPush('SAVEUTMESTATUS', projectManagers[itemNo])
         if (i % batchNo === 0 && i !== 0) {
             currentBatch += 1
