@@ -2063,8 +2063,7 @@ async function onStudentsRecordSendSave(req, res) {
             batchCondition[0] = currentBatch
             // await waitForServerProcess(delays)
             const copyprojectManagers = projectManagers
-            const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)
-            // const waitanswer = await waitForServerProcess(delays)
+            const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)// const waitanswer = await waitForServerProcess(delays)
         }
         else{itemNo = itemNo + 1}
         console.log("COUNT OF PM::", itemNo)
