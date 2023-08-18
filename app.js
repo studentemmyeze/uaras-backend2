@@ -1065,8 +1065,8 @@ function httpsPost({body, ...options}) {
 
 
 //app.use(bodyParser.json());
-app.use(express.json());
-app.use(morgan('tiny'));
+// app.use(express.json());
+// app.use(morgan('tiny'));
 
 // app.use(bodyParser.urlencoded({ extended: false }));
 app.use(fileUpload());
@@ -2059,7 +2059,7 @@ async function onStudentsRecordSendSave(req, res) {
             // const waitanswer = await waitForServerProcess(delays)
         }
         else{itemNo = itemNo + 1}
-        console.log("COUNT OF PM::", copyprojectManagers.length)
+        console.log("COUNT OF PM::", itemNo)
         // projectManagers = []
         // console.log("this is i", i)
 
