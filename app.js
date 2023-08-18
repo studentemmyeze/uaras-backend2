@@ -476,6 +476,7 @@ async function updateStudentRecord_Registrations(type,tableName, record) {
 async function matchUTMECandidateHashSaved(type,tableName, toSendSample) {
     try {
         // reg_num, department, school, student_type, recommendation, qualified
+        console.log('at saved::', toSendSample)
         const r1 = await recordsFromATableGrab(type,toSendSample.reg_num, tableName)
         if (r1.length > 0) {
             const newJSON =
