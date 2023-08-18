@@ -2009,7 +2009,7 @@ async function onStudentsRecordSendSave(req, res) {
     }
     if (delayspec) {delays = delayspec}
 
-
+    makeConnection()
     console.log("AWAIT REGNOS RESULT")
 
     const regNoList = await getAllRegNoMain(start, stop, dateLast, course)
@@ -2027,7 +2027,7 @@ async function onStudentsRecordSendSave(req, res) {
     //  batchCondition[2] = total
 
     let oldtkMessage = ""
-    makeConnection()
+
     if (!await checkTableExists(`uaras_saved_utme_candidate_status`)) {
         // await matchUTMECandidateHashSaved(type,`uaras_saved_utme_candidate_status`,toSendSample)
         await createTable(type,`uaras_saved_utme_candidate_status`)
