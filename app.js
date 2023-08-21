@@ -3600,8 +3600,7 @@ async function delPassmark(req, res) {
 
 // check to see what students have not been uploaded and try to reupload
 // steps
-
-async function checkPush2ChukaDifference(req,res) {
+async function checkPush2Chuka4Issues() {
     const theMainTableReg = await getAllRegNoMain(0);
     const thePushedTableReg = await getAllRegNoMain(0,undefined, undefined,undefined,'POSTSTATUS')
 
@@ -3614,12 +3613,20 @@ async function checkPush2ChukaDifference(req,res) {
             difference.push(reg['reg_num'])
         }
     })
+    return {
+        "theMainTableReg": theMainTableReg.length,
+        "thePushedTableReg": thePushedTableReg.length,
+        "difference": difference
+    }
+}
+async function checkPush2ChukaDifference(req,res) {
+    const issues = await checkPush2Chuka4Issues()
 
     try {
 
-        if (theMainTableReg.length > 0 && thePushedTableReg.length > 0) {
+        if (issues.theMainTableReg > 0 && issues.thePushedTableReg > 0) {
             res.status(200).json({
-                data: {"theMainTableReg": theMainTableReg.length,"thePushedTableReg": thePushedTableReg.length, "difference": difference},
+                data: issues,
                 status: 200
             });
         }
@@ -3636,6 +3643,113 @@ async function checkPush2ChukaDifference(req,res) {
     }
 }
 app.route('/api/tests').get(checkPush2ChukaDifference)
+
+app.route('/api/push-to-chuka-save-errors').get(onStudentsRecordSendSaveErrors)
+async function onStudentsRecordSendSaveErrors(req, res) {
+    // type = "UTME"
+    // let batchNo = 100;
+    // let currentBatch = 0;
+    // let itemNo = 0;
+    // var projectManagers = []
+    // var issuesBatches = []
+    // const start = req.query.start
+    // const stop = req.query.stop
+    // const dateLast = req.query.datelast
+    // const bSize = req.query.batchsize
+    // const delayspec = req.query.delays
+    // const course = req.query.course
+    // if (bSize) {
+    //     batchNo = bSize
+    // }
+    // if (delayspec) {delays = delayspec}
+    const issues = await checkPush2Chuka4Issues()
+    makeConnection()
+
+
+    // console.log("AWAIT REGNOS RESULT")
+
+    // const regNoList = await getAllRegNoMain(start, stop, dateLast, course)
+    var total = 0
+    try {
+        total = issues.difference.length;
+        // console.log("REGNOS RESULT",regNoList)
+
+    } catch  {
+        console.log('No students found within this search parameters')
+    }
+    //  var total = regNoList.length;
+    console.log("REGNOS RESULT",total)
+
+    //  batchCondition[2] = total
+
+    let oldtkMessage = ""
+
+    // if (!await checkTableExists(`uaras_saved_utme_candidate_status`)) {
+    //     // await matchUTMECandidateHashSaved(type,`uaras_saved_utme_candidate_status`,toSendSample)
+    //     await createTable(type,`uaras_saved_utme_candidate_status`)
+    //
+    // }
+
+    for (let i = 0; i < total ; i++) {
+
+        const aRegNo = issues.difference
+        batchCondition[1] = i
+        const response = await requestWithRetry (i,aRegNo,type, projectManagers)
+        // console.log("this is projectManagers", projectManagers)
+        await saveDetailsOfPush('SAVEUTMESTATUS', projectManagers[itemNo])
+        if (i % batchNo === 0 && i !== 0) {
+            currentBatch += 1
+            batchCondition[0] = currentBatch
+
+            const copyprojectManagers = projectManagers
+            projectManagers = []
+            itemNo = 0
+            // await waitForServerProcess(delays)
+
+            const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)
+            if (currentBatch === 1){
+                console.log(copyprojectManagers);
+
+            }
+            // issuesBatches = []
+
+        }
+        else if(i+ 1 === total){
+            currentBatch += 1
+            batchCondition[0] = currentBatch
+            // await waitForServerProcess(delays)
+            const copyprojectManagers = projectManagers
+            const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)// const waitanswer = await waitForServerProcess(delays)
+            console.log('total number sent in this batch::', copyprojectManagers.length)
+        }
+        else{itemNo = itemNo + 1}
+        console.log("COUNT OF PM::", itemNo)
+        // projectManagers = []
+        // console.log("this is i", i)
+
+    }
+    closeConnection()
+
+    console.log("ISSUES----------")
+    console.log(issuesBatches)
+    console.log("ISSUES----------")
+
+    try {
+        res.status(200).json({
+            message: `post qualified successful `,
+            count:total,
+            status: 200
+        });
+
+    }
+    catch (error) {
+        res.status(500).json({
+            message: "Error, Failed to send from batch of the record",
+        });
+    }
+
+
+}
 
 
 module.exports = app;
