@@ -3608,10 +3608,10 @@ async function checkPush2ChukaDifference(req,res) {
     console.log('.....In test:::')
     const difference = []
     theMainTableReg.forEach(reg => {
-        let obj = thePushedTableReg.find(y =>y === reg )
+        let obj = thePushedTableReg.find(y =>y['reg_num'] === reg['reg_num'] )
         // console.log('obj', obj, reg)
         if (!obj) {
-            difference.push(reg)
+            difference.push(reg['reg_num'])
         }
     })
 
