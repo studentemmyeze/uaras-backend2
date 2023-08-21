@@ -62,7 +62,8 @@ const mainTableName = {
     "JUPEB":'uaras_jupeb_candidates',
     "SUP":'uaras_sup_candidates',
     "POSTUTME": 'uaras_putme_score',
-    "UTMEREG": 'uaras_utme_reg'
+    "UTMEREG": 'uaras_utme_reg',
+    "POSTSTATUS": 'uaras_saved_utme_candidate_status'
 }
 
 const tempTableName = {
@@ -3596,6 +3597,33 @@ async function delPassmark(req, res) {
 // update working quota (single)
 
 
+// check to see what students have not been uploaded and try to reupload
+// steps
+
+async function checkPush2ChukaDifference(req,res) {
+    const theMainTableReg = await getAllRegNoMain(0)
+    const thePushedTableReg = await getAllRegNoMain(0,undefined, undefined,undefined,'POSTSTATUS')
+    console.log('.....In test:::')
+    try {
+
+        if (theMainTableReg.length() > 0 && thePushedTableReg.length() > 0) {
+            res.status(200).json({
+                data: {"theMainTableReg": theMainTableReg,"thePushedTableReg": thePushedTableReg}, status: 200
+            });
+        }
+        else {
+            res.status(202).json({
+                data: {}, status: 202
+            });
+        }
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to retrieve tests results",
+        });
+    }
+}
+app.route('/api/tests').get(checkPush2ChukaDifference)
 
 
 module.exports = app;
