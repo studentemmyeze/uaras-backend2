@@ -3646,12 +3646,12 @@ app.route('/api/tests').get(checkPush2ChukaDifference)
 
 app.route('/api/push-to-chuka-save-errors').get(onStudentsRecordSendSaveErrors)
 async function onStudentsRecordSendSaveErrors(req, res) {
-    // type = "UTME"
-    // let batchNo = 100;
-    // let currentBatch = 0;
-    // let itemNo = 0;
-    // var projectManagers = []
-    // var issuesBatches = []
+    type = "UTME"
+    let batchNo = 100;
+    let currentBatch = 0;
+    let itemNo = 0;
+    var projectManagers = []
+    var issuesBatches = []
     // const start = req.query.start
     // const stop = req.query.stop
     // const dateLast = req.query.datelast
@@ -3662,8 +3662,9 @@ async function onStudentsRecordSendSaveErrors(req, res) {
     //     batchNo = bSize
     // }
     // if (delayspec) {delays = delayspec}
-    const issues = await checkPush2Chuka4Issues()
     makeConnection()
+    const issues = await checkPush2Chuka4Issues()
+
 
 
     // console.log("AWAIT REGNOS RESULT")
