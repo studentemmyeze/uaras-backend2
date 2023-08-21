@@ -3604,13 +3604,16 @@ async function delPassmark(req, res) {
 async function checkPush2ChukaDifference(req,res) {
     const theMainTableReg = await getAllRegNoMain(0);
     const thePushedTableReg = await getAllRegNoMain(0,undefined, undefined,undefined,'POSTSTATUS')
+
     console.log('.....In test:::')
     const difference = []
-    for  (const x in theMainTableReg) {
-        if (! x in thePushedTableReg) {
-            difference.push(x)
+    theMainTableReg.forEach(reg => {
+        let obj = thePushedTableReg.find(y =>y === reg )
+        // console.log('obj', obj, reg)
+        if (!obj) {
+            difference.push(reg)
         }
-    }
+    })
 
     try {
 
