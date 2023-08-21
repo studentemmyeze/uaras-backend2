@@ -2830,7 +2830,8 @@ async function onStudentsRecordBatch(req, res) {
 
 }
 
-async function getAllRegNoMain(start, stop, dateLast, course, type="UTME") {
+async function getAllRegNoMain(start, stop=undefined,
+                               dateLast=undefined, course=undefined, type="UTME") {
     // var type = "UTME"
     if (start || stop) {
         var queryTemp = `SELECT reg_num FROM ${mainTableName[type]}
@@ -3601,14 +3602,22 @@ async function delPassmark(req, res) {
 // steps
 
 async function checkPush2ChukaDifference(req,res) {
-    const theMainTableReg = await getAllRegNoMain(0)
+    const theMainTableReg = await getAllRegNoMain(0);
     const thePushedTableReg = await getAllRegNoMain(0,undefined, undefined,undefined,'POSTSTATUS')
     console.log('.....In test:::')
+    const difference = []
+    for  (const x in theMainTableReg) {
+        if (! x in thePushedTableReg) {
+            difference.push(x)
+        }
+    }
+
     try {
 
-        if (theMainTableReg.length() > 0 && thePushedTableReg.length() > 0) {
+        if (theMainTableReg.length > 0 && thePushedTableReg.length > 0) {
             res.status(200).json({
-                data: {"theMainTableReg": theMainTableReg,"thePushedTableReg": thePushedTableReg}, status: 200
+                data: {"theMainTableReg": theMainTableReg.length,"thePushedTableReg": thePushedTableReg.length, "difference": difference},
+                status: 200
             });
         }
         else {
