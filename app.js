@@ -2833,11 +2833,12 @@ async function onStudentsRecordBatch(req, res) {
 async function getAllRegNoMain(start, stop=undefined,
                                dateLast=undefined, course=undefined, type="UTME") {
     // var type = "UTME"
+    let queryTemp = '';
     if (start || stop) {
-        var queryTemp = `SELECT reg_num FROM ${mainTableName[type]}
+        queryTemp = `SELECT reg_num FROM ${mainTableName[type]}
   WHERE id >= ${start} `
         if (stop) {
-            queryTemp +=  `AND id <= ${stop}`
+            queryTemp +=  `AND id <= ${stop}`;
         }
         if (dateLast) {
             queryTemp +=  `AND edited >= '${dateLast}'`
@@ -2851,7 +2852,7 @@ async function getAllRegNoMain(start, stop=undefined,
 
     }
     else{
-        var queryTemp = `SELECT reg_num FROM ${mainTableName[type]}
+        queryTemp = `SELECT reg_num FROM ${mainTableName[type]}
   `
     }
     const answer = await doQuery(queryTemp)
@@ -3646,7 +3647,7 @@ app.route('/api/tests').get(checkPush2ChukaDifference)
 
 app.route('/api/push-to-chuka-save-errors').get(onStudentsRecordSendSaveErrors)
 async function onStudentsRecordSendSaveErrors(req, res) {
-    type = "UTME"
+    let type = 'UTME';
     let batchNo = 100;
     let currentBatch = 0;
     let itemNo = 0;
@@ -3662,9 +3663,9 @@ async function onStudentsRecordSendSaveErrors(req, res) {
     //     batchNo = bSize
     // }
     // if (delayspec) {delays = delayspec}
-    await makeConnection()
-    const issues = await checkPush2Chuka4Issues()
 
+    const issues = await checkPush2Chuka4Issues()
+    await makeConnection()
 
 
     // console.log("AWAIT REGNOS RESULT")
@@ -3696,7 +3697,7 @@ async function onStudentsRecordSendSaveErrors(req, res) {
 
         batchCondition[1] = i
         const response = await requestWithRetry (i,aRegNo,type, projectManagers)
-        // console.log("this is projectManagers", projectManagers)
+        console.log("this is projectManagers", projectManagers)
         await saveDetailsOfPush('SAVEUTMESTATUS', projectManagers[itemNo])
         if (i % batchNo === 0 && i !== 0) {
             currentBatch += 1
