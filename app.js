@@ -3067,7 +3067,7 @@ async function getStudentRegistrationInfo(ii,regNo, type, projectM) {
 
                         }
 
-                        // console.log("TO SEND2", toSend2)
+                        console.log("TO SEND2", toSend2)
 
                         if (toSend2) {
                             // p2[ii+1] = toSend2
@@ -3665,7 +3665,7 @@ async function onStudentsRecordSendSaveErrors(req, res) {
     // if (delayspec) {delays = delayspec}
 
     const issues = await checkPush2Chuka4Issues()
-    await makeConnection()
+    // await makeConnection()
 
 
     // console.log("AWAIT REGNOS RESULT")
@@ -3692,6 +3692,7 @@ async function onStudentsRecordSendSaveErrors(req, res) {
     //
     // }
     const aRegNo = issues.difference
+    console.log('here are all the regNos-', aRegNo)
     for (let i = 0; i < total ; i++) {
 
 
@@ -3730,7 +3731,7 @@ async function onStudentsRecordSendSaveErrors(req, res) {
         // console.log("this is i", i)
 
     }
-    await closeConnection()
+    // await closeConnection()
 
     console.log("ISSUES----------")
     console.log(issuesBatches)
