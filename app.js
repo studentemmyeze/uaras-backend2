@@ -3662,7 +3662,7 @@ async function onStudentsRecordSendSaveErrors(req, res) {
     //     batchNo = bSize
     // }
     // if (delayspec) {delays = delayspec}
-    makeConnection()
+    await makeConnection()
     const issues = await checkPush2Chuka4Issues()
 
 
@@ -3690,10 +3690,10 @@ async function onStudentsRecordSendSaveErrors(req, res) {
     //     await createTable(type,`uaras_saved_utme_candidate_status`)
     //
     // }
-
+    const aRegNo = issues.difference
     for (let i = 0; i < total ; i++) {
 
-        const aRegNo = issues.difference
+
         batchCondition[1] = i
         const response = await requestWithRetry (i,aRegNo,type, projectManagers)
         // console.log("this is projectManagers", projectManagers)
@@ -3729,7 +3729,7 @@ async function onStudentsRecordSendSaveErrors(req, res) {
         // console.log("this is i", i)
 
     }
-    closeConnection()
+    await closeConnection()
 
     console.log("ISSUES----------")
     console.log(issuesBatches)
