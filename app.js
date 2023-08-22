@@ -3692,7 +3692,7 @@ async function onStudentsRecordSendSaveErrors(req, res) {
     //
     // }
     
-    console.log('here are all the regNos-', aRegNo)
+    console.log('here are all the regNos-', issues.difference)
     for (let i = 0; i < total ; i++) {
 
         const aRegNo = (issues.difference)[i]
