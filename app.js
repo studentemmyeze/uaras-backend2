@@ -3691,11 +3691,11 @@ async function onStudentsRecordSendSaveErrors(req, res) {
     //     await createTable(type,`uaras_saved_utme_candidate_status`)
     //
     // }
-    const aRegNo = issues.difference
+    
     console.log('here are all the regNos-', aRegNo)
     for (let i = 0; i < total ; i++) {
 
-
+        const aRegNo = (issues.difference)[i]
         batchCondition[1] = i
         const response = await requestWithRetry (i,aRegNo,type, projectManagers)
         console.log("this is projectManagers", projectManagers)
