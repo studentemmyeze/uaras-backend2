@@ -1469,7 +1469,7 @@ app.get('/api/push-status', (req, res, next) => {
 app.route('/api/uploadutme').post(onFileupload)
 
 async function onFileupload(req, res) {
-    type ='UTME'
+    const type ='UTME'
     // type22 = req.body.type
     const schoolType = req.body.type
 
