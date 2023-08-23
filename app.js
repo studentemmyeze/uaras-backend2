@@ -1546,52 +1546,66 @@ async function onFileuploadDE(req, res) {
     type ='DE'
     var schoolType = req.body.type
     console.log("IN DE")
-    resetVariables(type)
-    // for each record in the temp table
-    // hash that record h1
-    // get the corresponding record on the main table
-    // hash the main table record, h2
-    // if h1 === h2 skip else replace main table record with temp table record
 
-
-    await getExcelData(type, req.files.file.data)
-    makeConnection()
-    // check if temp table exists // delete if it exists
-    if (await checkTableExists(tempTableName[type])) {await deleteTable(tempTableName[type])}
-    // create temp table
-    console.log("IN DE- after check if temp table exists")
-
-    const crttblResult = await createTable(type,tempTableName[type])
-    console.log('create table result::', crttblResult)
-    if (tempUTME && tempUTME[type]) {
-        console.log('records to add::',tempUTME[type] )
-        await addRecords(type,tempTableName[type], schoolType)
+    if (uploadStatus[type] != 'ready' && uploadStatus[type] != 'success') {
+        res.status(204).json({
+            message: "An upload operation is still ongoing. Try again later",
+        });
     }
-    if (await checkTableExists(mainTableName[type])) {
-        await matchUTMECandidateHash(type,mainTableName[type], tempTableName[type], schoolType)
-    }
-
 
     else {
-        await createTable(type,mainTableName[type])
-        await addRecords(type, mainTableName[type], schoolType)
-    }
-    console.log("IN DE- after check if main table exists")
-
-    closeConnection()
-
-    time_taken_string[type] = getTimeTaken();
-    uploadStatus[type] = 'success'
+        resetVariables(type)
 
 
-    try {
-        res.status(201).json({
-            message: "utme candidate data processed successfully"
-        });
-    } catch (error) {
-        res.status(500).json({
-            message: "Error during processing",
-        });
+
+
+        
+        // for each record in the temp table
+        // hash that record h1
+        // get the corresponding record on the main table
+        // hash the main table record, h2
+        // if h1 === h2 skip else replace main table record with temp table record
+
+
+        await getExcelData(type, req.files.file.data)
+        makeConnection()
+        // check if temp table exists // delete if it exists
+        if (await checkTableExists(tempTableName[type])) {await deleteTable(tempTableName[type])}
+        // create temp table
+        console.log("IN DE- after check if temp table exists")
+
+        const crttblResult = await createTable(type,tempTableName[type])
+        // console.log('create table result::', crttblResult)
+        if (tempUTME && tempUTME[type]) {
+            // console.log('records to add::',tempUTME[type] )
+            await addRecords(type,tempTableName[type], schoolType)
+        }
+        if (await checkTableExists(mainTableName[type])) {
+            await matchUTMECandidateHash(type,mainTableName[type], tempTableName[type], schoolType)
+        }
+
+
+        else {
+            await createTable(type,mainTableName[type])
+            await addRecords(type, mainTableName[type], schoolType)
+        }
+        console.log("IN DE- after check if main table exists")
+
+        closeConnection()
+
+        time_taken_string[type] = getTimeTaken();
+        uploadStatus[type] = 'success'
+
+
+        try {
+            res.status(201).json({
+                message: "DE candidate data processed successfully"
+            });
+        } catch (error) {
+            res.status(500).json({
+                message: "Error during processing",
+            });
+        }
     }
 
 
