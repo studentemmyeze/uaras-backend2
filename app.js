@@ -11,6 +11,7 @@ const mysql = require('mysql');
 // const morgan = require('morgan')
 const fetch = require('node-fetch');
 var fs = require('fs');
+const { type } = require('os');
 require('dotenv/config');
 
 
@@ -186,6 +187,19 @@ const queryCreateTable = {
 }
 
 
+
+// push data
+const pushParams = {"UTME":[], "DE":[], "PRE":[],"JUPEB":[],"SUP":[], "POSTUTME":[], "SAVEUTMESTATUS": []};
+const pushDataTotal2Push = {"UTME":[], "DE":[], "PRE":[],"JUPEB":[],"SUP":[], "POSTUTME":[], "SAVEUTMESTATUS": []};
+const pushStatus = {"UTME":'ready', "DE":'ready', "PRE":'ready',"JUPEB":'ready',"SUP":'ready', "POSTUTME":'ready', "SAVEUTMESTATUS": ""};
+const pushStatusMessage = {"UTME":'', "DE":'', "PRE":'',"JUPEB":'',"SUP":'', "POSTUTME":'', "SAVEUTMESTATUS": ""};
+const pushTime_taken_string = {"UTME":'', "DE":'', "PRE":'',"JUPEB":'',"SUP":'', "POSTUTME":'', "SAVEUTMESTATUS": []};
+const pushDate_start = {"UTME":new Date(), "DE":new Date(), "PRE":new Date(),"JUPEB":new Date(),"SUP":new Date(), "POSTUTME":new Date()};
+const pushDataProcessed = {"UTME":[], "DE":[], "PRE":[],"JUPEB":[],"SUP":[], "POSTUTME":[], "SAVEUTMESTATUS": []};
+const pushDataNotProcessed = {"UTME":[], "DE":[], "PRE":[],"JUPEB":[],"SUP":[], "POSTUTME":[], "SAVEUTMESTATUS": []};
+const successBatchCount = {"UTME":0, "DE":0, "PRE":0,"JUPEB":0,"SUP":0, "POSTUTME":0, "SAVEUTMESTATUS": 0};
+
+// upload stats
 const uploadStatus = {"UTME":'ready', "DE":'ready', "PRE":'ready',"JUPEB":'ready',"SUP":'ready', "POSTUTME":'ready', "SAVEUTMESTATUS": ""};
 const uploadStatusMessage = {"UTME":'', "DE":'', "PRE":'',"JUPEB":'',"SUP":'', "POSTUTME":'', "SAVEUTMESTATUS": ""};
 
@@ -1277,7 +1291,9 @@ function getTimeTaken() {
 }
 
 function getStat(type) {
-    time_taken_string[type] = getTimeTaken();
+    if (uploadStatus[type] !== 'ready' || uploadStatus[type] !== 'success' ) {
+        time_taken_string[type] = getTimeTaken();
+    }
 
 
     var statusMessage = {
@@ -1295,6 +1311,37 @@ function getStat(type) {
     }
 
     return statusMessage
+}
+
+function getPushStat(type) {
+    if (pushStatus[type] !== 'ready' || pushStatus[type] !== 'success' ) {
+        time_taken_string[type] = getTimeTaken();
+    }
+
+
+    var statusMessage = {
+        status: pushStatus[type],
+        pushParams: pushParams[type],
+        status_message: pushStatusMessage[type],
+        time_taken: pushTime_taken_string[type],
+        total_rowdata_pushed_to_api: pushDataProcessed[type].length, //successful push regno
+        total_successful_batch: successBatchCount[type],
+        total_error: pushDataNotProcessed[type].length,
+        total2push: pushDataTotal2Push[type].length, // count of regno to send to chuka
+        type:type
+    }
+
+    return statusMessage
+}
+function resetPushVariables(type) {
+    pushStatus[type] = 'pending'
+    pushParams[type] = []
+    pushStatusMessage[type] = []
+    pushDataProcessed[type] = []
+    pushDataNotProcessed[type] = []
+    pushDataTotal2Push[type] = []
+    pushTime_taken_string[type] = ''
+    date_start[type] = new Date()
 }
 
 function resetVariables(type) {
@@ -1317,20 +1364,20 @@ app.get('/', (req, res, next) => {
 // batch, currentNo, totalToProcess
 var batchCondition = [0,0,0]
 
-app.get('/api/push-qualified-status', (req, res, next) => {
-    // app.route('/api/status').get(onStatusQuery)
-    // async function onStatusQuery(req, res) {
+// app.get('/api/push-qualified-status', (req, res, next) => {
+//     // app.route('/api/status').get(onStatusQuery)
+//     // async function onStatusQuery(req, res) {
 
-    try {
-        res.status(200).json({
-            batchCondition: {batch:batchCondition[0], currentNo:batchCondition[1], total:batchCondition[2]}
-        });
-    } catch (error) {
-        res.status(500).json({
-            message: "Failed to retrieve status",
-        });
-    }
-})
+//     try {
+//         res.status(200).json({
+//             batchCondition: {batch:batchCondition[0], currentNo:batchCondition[1], total:batchCondition[2]}
+//         });
+//     } catch (error) {
+//         res.status(500).json({
+//             message: "Failed to retrieve status",
+//         });
+//     }
+// })
 
 
 app.get('/api/status', (req, res, next) => {
@@ -1374,6 +1421,49 @@ app.get('/api/status', (req, res, next) => {
         });
     }
 })
+
+app.get('/api/push-status', (req, res, next) => {
+    // app.route('/api/status').get(onStatusQuery)
+    // async function onStatusQuery(req, res) {
+        console.log("request", req.query.type)
+        const type = req.query.type
+        // type22 = req.body.type
+        // const seeLastOp = req.query.lastOpStat
+    
+        var statusMessage = {status: pushStatus[type]}
+        // if (seeLastOp) {statusMessage = lastOpStat}
+        if (pushStatus[type] !== 'ready') {
+    
+            // time_taken_string[type] = "";
+    //     time_taken_string[type] = getTimeTaken();
+    
+    
+    //   var statusMessage = {
+    //     status: uploadStatus[type],
+    //     status_message: uploadStatusMessage[type],
+    //     time_taken: time_taken_string[type],
+    //     total_rowdata_uploaded_to_api: tempUTME[type].length,
+    
+    //     rowdata_saved_to_temp: tempDataReceived[type].length,
+    //     new_rowdata_in_main: tempDataMovedToMain[type].length,
+    //   rowdata_info_updated: updatedData[type].length,
+    //   rowdata_processed_success: totalTempDataProcessed[type].length,
+    //   rowdata_error: dataNotProcessed[type].length}
+    // }
+            statusMessage = getPushStat(type)
+        }
+    
+        try {
+            res.status(200).json({
+                statusMessage
+            });
+        } catch (error) {
+            res.status(500).json({
+                message: "Failed to retrieve push status",
+            });
+        }
+    })
+    
 
 // endpoint for xlsx upload-receive Uploaded UTME
 app.route('/api/uploadutme').post(onFileupload)
@@ -1889,18 +1979,6 @@ async function onSuggestFromPython(aJSON) {
         headers:headers,
         // body: (aJSON),
     };
-// const headers = {
-//   "Content-Type": "application/json",
-//   "client_id": "1001125",
-//   "client_secret": "876JHG76UKFJYGVHf867rFUTFGHCJ8JHV"
-// }
-// const data = {
-//   "name": "Wade Wilson",
-//   "occupation": "Murderer",
-//   "age": "30 (forever)"
-// }
-
-
 
 
 
@@ -1912,18 +1990,6 @@ async function onSuggestFromPython(aJSON) {
         })
         .catch(err => {console.log("ERROR AT PYTHON GET")})
 
-
-
-// fetch(url)
-//   .then((res) => {
-//      return res.json()
-// })
-// .then((json) => {
-//    // Do something with the returned data.
-//   console.log("received from python",json);
-
-// });
-    // this.http.get<{combostatus: number, suggest: any}>(`${this.apiUrl2}/api/suggest-department`,{params:queryParams})
 
 }
 
@@ -2008,106 +2074,158 @@ async function waitForServerProcess(adelays) {
 app.route('/api/push-to-chuka-save').get(onStudentsRecordSendSave)
 async function onStudentsRecordSendSave(req, res) {
     type = "UTME"
-    let batchNo = 100;
-    let currentBatch = 0;
-    let itemNo = 0;
-    var projectManagers = []
-    var issuesBatches = []
-    const start = req.query.start
-    const stop = req.query.stop
-    const dateLast = req.query.datelast
-    const bSize = req.query.batchsize
-    const delayspec = req.query.delays
-    const course = req.query.course
-    if (bSize) {
-        batchNo = bSize
-    }
-    if (delayspec) {delays = delayspec}
-
-    makeConnection()
-    console.log("AWAIT REGNOS RESULT")
-
-    const regNoList = await getAllRegNoMain(start, stop, dateLast, course)
-    var total = 0
-    try {
-        total = regNoList.length;
-        // console.log("REGNOS RESULT",regNoList)
-
-    } catch  {
-        console.log('No students found within this search parameters')
-    }
-    //  var total = regNoList.length;
-    console.log("REGNOS RESULT",total)
-
-    //  batchCondition[2] = total
-
-    let oldtkMessage = ""
-
-    if (!await checkTableExists(`uaras_saved_utme_candidate_status`)) {
-        // await matchUTMECandidateHashSaved(type,`uaras_saved_utme_candidate_status`,toSendSample)
-        await createTable(type,`uaras_saved_utme_candidate_status`)
-
+    if (pushStatus[type] != 'ready' && pushStatus[type] != 'success') {
+        res.status(204).json({
+            message: "A push operation is still ongoing. Try again later",
+        });
     }
 
-    for (let i = 0; i < total ; i++) {
+    else {
+        resetPushVariables(type)
 
-        const aRegNo = regNoList[i]['reg_num']
-        batchCondition[1] = i
-        const response = await requestWithRetry (i,aRegNo,type, projectManagers)
-        // console.log("this is projectManagers", projectManagers)
-        await saveDetailsOfPush('SAVEUTMESTATUS', projectManagers[itemNo])
-        if (i % batchNo === 0 && i !== 0) {
-            currentBatch += 1
-            batchCondition[0] = currentBatch
 
-            const copyprojectManagers = projectManagers
-            projectManagers = []
-            itemNo = 0
-            // await waitForServerProcess(delays)
 
-            const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)
-            if (currentBatch === 1){
-                console.log(copyprojectManagers);
+
+
+
+        type = "UTME"
+        let batchNo = 100;
+        let currentBatch = 0;
+        let itemNo = 0;
+        var projectManagers = []
+        var issuesBatches = []
+        const start = req.query.start
+        const stop = req.query.stop
+        const dateLast = req.query.datelast
+        const bSize = req.query.batchsize
+        const delayspec = req.query.delays
+        const course = req.query.course
+        if (bSize) {
+            batchNo = bSize
+        }
+        if (delayspec) {delays = delayspec}
+
+
+
+
+
+
+
+        makeConnection()
+        console.log("AWAIT REGNOS RESULT")
+
+        const regNoList = await getAllRegNoMain(start, stop, dateLast, course)
+        var total = 0
+        try {
+            total = regNoList.length;
+            pushDataTotal2Push[type] = total
+
+            // status: pushStatus[type],
+            pushParams[type] = {'start' : start, 'stop': stop, 'dateLast': dateLast, 'batchsize': bSize, 'course': course}
+            // console.log("REGNOS RESULT",regNoList)
+
+        } catch  {
+            console.log('No students found within this search parameters')
+        }
+        //  var total = regNoList.length;
+        console.log("REGNOS RESULT",total)
+
+        if (!await checkTableExists(`uaras_saved_utme_candidate_status`)) {
+            // await matchUTMECandidateHashSaved(type,`uaras_saved_utme_candidate_status`,toSendSample)
+            await createTable(type,`uaras_saved_utme_candidate_status`)
+
+        }
+
+        for (let i = 0; i < total ; i++) {
+
+            const aRegNo = regNoList[i]['reg_num']
+            batchCondition[1] = i
+            const response = await requestWithRetry (i,aRegNo,type, projectManagers)
+            // console.log("this is projectManagers", projectManagers)
+            await saveDetailsOfPush('SAVEUTMESTATUS', projectManagers[itemNo])
+            // pushDataProcessed[type].push(aRegNo)
+
+
+        //     status: pushStatus[type],
+        // pushParams: pushParams[type],
+        // status_message: pushStatusMessage[type],
+        // time_taken: pushTime_taken_string[type],
+        // total_rowdata_pushed_to_api: ,
+        // total_successful_batch: 
+        // total_error:
+        // total2push:
+        // type:type
+
+
+
+
+            if (i % batchNo === 0 && i !== 0) {
+                currentBatch += 1
+                batchCondition[0] = currentBatch
+
+                const copyprojectManagers = projectManagers
+                projectManagers = []
+                itemNo = 0
+                // await waitForServerProcess(delays)
+
+                const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)
+                // if successful
+                successBatchCount[type] = successBatchCount[type] + 1
+                pushDataProcessed[type].concat(copyprojectManagers)
+                // else
+                pushDataNotProcessed[type].concat(copyprojectManagers)
+
+                if (currentBatch === 1){
+                    console.log(copyprojectManagers);
+
+                }
+                // issuesBatches = []
 
             }
-            // issuesBatches = []
+            else if(i+ 1 === total){
+                currentBatch += 1
+                batchCondition[0] = currentBatch
+                // await waitForServerProcess(delays)
+                const copyprojectManagers = projectManagers
+                const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)// const waitanswer = await waitForServerProcess(delays)
+                console.log('total number sent in this batch::', copyprojectManagers.length)
+                // if successful
+                successBatchCount[type] = successBatchCount[type] + 1
+                pushDataProcessed[type].concat(copyprojectManagers)
+                // else
+                pushDataNotProcessed[type].concat(copyprojectManagers)
+            }
+            else{itemNo = itemNo + 1}
+            console.log("COUNT OF PM::", itemNo)
+            // projectManagers = []
+            // console.log("this is i", i)
 
         }
-        else if(i+ 1 === total){
-            currentBatch += 1
-            batchCondition[0] = currentBatch
-            // await waitForServerProcess(delays)
-            const copyprojectManagers = projectManagers
-            const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)// const waitanswer = await waitForServerProcess(delays)
-            console.log('total number sent in this batch::', copyprojectManagers.length)
+        closeConnection()
+
+        console.log("ISSUES----------")
+        console.log(issuesBatches)
+        console.log("ISSUES----------")
+
+        pushTime_taken_string[type] = getTimeTaken();
+        pushStatus[type] = 'success'
+
+        try {
+            res.status(200).json({
+                message: `post qualified successful `,
+                count:total,
+                status: 200
+            });
+
         }
-        else{itemNo = itemNo + 1}
-        console.log("COUNT OF PM::", itemNo)
-        // projectManagers = []
-        // console.log("this is i", i)
+        catch (error) {
+            res.status(500).json({
+                message: "Error, Failed to send from batch of the record",
+            });
+        }
+
 
     }
-    closeConnection()
-
-    console.log("ISSUES----------")
-    console.log(issuesBatches)
-    console.log("ISSUES----------")
-
-    try {
-        res.status(200).json({
-            message: `post qualified successful `,
-            count:total,
-            status: 200
-        });
-
-    }
-    catch (error) {
-        res.status(500).json({
-            message: "Error, Failed to send from batch of the record",
-        });
-    }
-
-
 }
 
 //get maximum on main table
@@ -2883,10 +3001,6 @@ async function getAllRegNoMain(start, stop=undefined,
     }
 }
 
-async function sendBatch() {
-
-
-}
 
 
 function wait (timeout) {
