@@ -498,8 +498,8 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample) {
                 {reg_num: toSendSample.reg_num , department: toSendSample.department,
 
                     school: (toSendSample.phone ? (
-                        toSendSample.phone ==="1" ? "UMUNZE" :
-                            (toSendSample.phone ==="2" ? "AUCHI":(toSendSample.phone ==="3" ? "POPE JOHN" : "ESCET"))) : 'UNIZIK' ) ,
+                        (toSendSample.phone).toString() ==="1" ? "UMUNZE" :
+                            ((toSendSample.phone).toString()  ==="2" ? "AUCHI":(t(toSendSample.phone).toString()  ==="3" ? "POPE JOHN" : "ESCET"))) : 'UNIZIK' ) ,
                     student_type: toSendSample.student_type,
                     recommendation: toSendSample.recommendation, qualified: toSendSample.qualified}
 
