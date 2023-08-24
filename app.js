@@ -2074,7 +2074,7 @@ async function waitForServerProcess(adelays) {
 app.route('/api/push-to-chuka-save').get(onStudentsRecordSendSave)
 async function onStudentsRecordSendSave(req, res) {
     let type = req.query.type
-    if (pushStatus[type] != 'ready' && pushStatus[type] != 'success') {
+    if (pushStatus[type] !== 'ready' && pushStatus[type] !== 'success') {
         res.status(204).json({
             message: "A push operation is still ongoing. Try again later",
         });
@@ -2111,7 +2111,7 @@ async function onStudentsRecordSendSave(req, res) {
 
 
 
-        makeConnection()
+        await makeConnection()
         console.log("AWAIT REGNOS RESULT")
 
         const regNoList = await getAllRegNoMain(start, stop, dateLast, course, type)
@@ -2201,7 +2201,7 @@ async function onStudentsRecordSendSave(req, res) {
             // console.log("this is i", i)
 
         }
-        closeConnection()
+        await closeConnection()
 
         console.log("ISSUES----------")
         console.log(issuesBatches)
