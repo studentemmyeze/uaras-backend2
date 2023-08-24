@@ -3121,6 +3121,22 @@ async function getStudentRegistrationInfo(ii,regNo, type, projectM) {
             if (type2) {
                 if (ajson.score < 160) {qualified = 0}
 
+                if (toSend[0]['utme_aggregate'] >= 160) {
+                    const atype2 = type2.toString()
+      
+                      qualified = 1
+                      recommend = {
+                        Info: atype2 ==="1" ? "UMUNZE" :
+                        (atype2 ==="2" ? "AUCHI":(atype2 ==="3" ? "POPE JOHN" : "ESCET"))
+      
+                      }
+      
+      
+                  }
+                  else if (toSend[0]['utme_aggregate'] >= 140) {
+                    qualified = 0
+                    recommend = {suggestAffiliate: affiliateLower}}
+
                 toSend2 = {
                     reg_num: toSend[0]['reg_num'],
                     lastname: toSend[0]['fullname'].split(' ')[0],
