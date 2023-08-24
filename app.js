@@ -497,7 +497,7 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample) {
             const newJSON =
                 {reg_num: toSendSample.reg_num , department: toSendSample.department,
 
-                    school: (toSendSample.school ? (
+                    school: (toSendSample.phone ? (
                         toSendSample.phone ==="1" ? "UMUNZE" :
                             (toSendSample.phone ==="2" ? "AUCHI":(toSendSample.phone ==="3" ? "POPE JOHN" : "ESCET"))) : 'UNIZIK' ) ,
                     student_type: toSendSample.student_type,
@@ -2168,7 +2168,7 @@ async function onStudentsRecordSendSave(req, res) {
                 itemNo = 0
                 // await waitForServerProcess(delays)
 
-                const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)
+                // const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)
                 // if successful
                 successBatchCount[type] = successBatchCount[type] + 1
                 pushDataProcessed[type].concat(copyprojectManagers)
@@ -2187,7 +2187,7 @@ async function onStudentsRecordSendSave(req, res) {
                 batchCondition[0] = currentBatch
                 // await waitForServerProcess(delays)
                 const copyprojectManagers = projectManagers
-                const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)// const waitanswer = await waitForServerProcess(delays)
+                // const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)// const waitanswer = await waitForServerProcess(delays)
                 console.log('total number sent in this batch::', copyprojectManagers.length)
                 // if successful
                 successBatchCount[type] = successBatchCount[type] + 1
