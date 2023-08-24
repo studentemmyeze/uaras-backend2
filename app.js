@@ -1583,7 +1583,7 @@ async function onFileupload(req, res) {
 
 }
 async function onFileupload2(req, res) {
-    type ='UTME'
+    let type ='UTME'
     resetVariables(type)
     // for each record in the temp table
     // hash that record h1
@@ -2073,7 +2073,7 @@ async function waitForServerProcess(adelays) {
 
 app.route('/api/push-to-chuka-save').get(onStudentsRecordSendSave)
 async function onStudentsRecordSendSave(req, res) {
-    type = "UTME"
+    let type = req.query.type
     if (pushStatus[type] != 'ready' && pushStatus[type] != 'success') {
         res.status(204).json({
             message: "A push operation is still ongoing. Try again later",
@@ -2088,7 +2088,7 @@ async function onStudentsRecordSendSave(req, res) {
 
 
 
-        type = "UTME"
+        // type = "UTME"
         let batchNo = 100;
         let currentBatch = 0;
         let itemNo = 0;
@@ -2114,7 +2114,7 @@ async function onStudentsRecordSendSave(req, res) {
         makeConnection()
         console.log("AWAIT REGNOS RESULT")
 
-        const regNoList = await getAllRegNoMain(start, stop, dateLast, course)
+        const regNoList = await getAllRegNoMain(start, stop, dateLast, course, type)
         var total = 0
         try {
             total = regNoList.length;
@@ -2233,7 +2233,7 @@ async function onStudentsRecordSendSave(req, res) {
 
 app.route('/api/push-to-chuka').get(onStudentsRecordSend)
 async function onStudentsRecordSend(req, res) {
-    type = "UTME"
+    let type = "UTME"
     let batchNo = 100;
     currentBatch = 0;
     var projectManagers = []
