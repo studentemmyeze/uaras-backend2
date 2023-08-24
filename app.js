@@ -1583,7 +1583,7 @@ async function onFileupload(req, res) {
 
 }
 async function onFileupload2(req, res) {
-    let type ='UTME'
+    type ='UTME'
     resetVariables(type)
     // for each record in the temp table
     // hash that record h1
