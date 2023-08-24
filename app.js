@@ -1472,7 +1472,7 @@ async function onFileupload(req, res) {
     const type ='UTME'
     // type22 = req.body.type
     const schoolType = req.body.type
-
+    
     console.log("in uploadutme umunze-1, auchi-2..", schoolType)
     if (uploadStatus[type] != 'ready' && uploadStatus[type] != 'success') {
         res.status(204).json({
