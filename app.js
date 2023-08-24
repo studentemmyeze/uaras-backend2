@@ -2962,22 +2962,22 @@ async function onStudentsRecordBatch(req, res) {
 
 }
 
-async function getAllRegNoMain(start, stop=undefined,
-                               dateLast=undefined, course=undefined, type="UTME") {
+async function getAllRegNoMain(start, stop,
+                               dateLast, course, type="UTME") {
     // var type = "UTME"
     let queryTemp = '';
     if (start || stop) {
         queryTemp = `SELECT reg_num FROM ${mainTableName[type]}
   WHERE id >= ${start} `
         if (stop) {
-            queryTemp +=  `AND id <= ${stop}`;
+            queryTemp +=  ` AND id <= ${stop}`;
         }
         if (dateLast) {
-            queryTemp +=  `AND edited >= '${dateLast}'`
+            queryTemp +=  ` AND edited >= '${dateLast}'`
         }
 
         if (course) {
-            queryTemp +=  `AND department LIKE '${course}%'`
+            queryTemp +=  ` AND department LIKE '${course}%'`
         }
 
         console.log('getallregNo query::', queryTemp)
