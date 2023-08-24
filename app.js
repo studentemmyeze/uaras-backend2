@@ -2355,7 +2355,7 @@ async function onStudentsRecordSendDE(req, res) {
         const aRegNo = regNoList[i]['reg_num']
         batchCondition[1] = i
         const response = await requestWithRetry (i,aRegNo,type, projectManagers)
-        if (i % batchNo == 0 && i != 0) {
+        if (i % batchNo === 0 && i !== 0) {
             currentBatch += 1
             batchCondition[0] = currentBatch
 
