@@ -2173,7 +2173,7 @@ async function onStudentsRecordSendSave(req, res) {
             batchCondition[1] = i
             const response = await requestWithRetry (i,aRegNo,type, projectManagers)
             // console.log("this is projectManagers", projectManagers)
-            console.log('phone::', regNoList[i]['phone'])
+            // console.log('phone::', regNoList[i]['phone'])
             await saveDetailsOfPush('SAVEUTMESTATUS', projectManagers[itemNo], regNoList[i]['phone'])
             // pushDataProcessed[type].push(aRegNo)
 
