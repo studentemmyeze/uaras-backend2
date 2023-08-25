@@ -490,7 +490,7 @@ async function updateStudentRecord_Registrations(type,tableName, record) {
     await doQuery(queryTemp)
 }
 
-async function matchUTMECandidateHashSaved(type,tableName, toSendSample) {
+async function matchUTMECandidateHashSaved(type,tableName, toSendSample, phone) {
     try {
         // reg_num, department, school, student_type, recommendation, qualified
         // console.log('at saved::', toSendSample)
@@ -504,28 +504,29 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample) {
 
 
         if (r1.length > 0) {
-            const recommendObj = JSON.parse(toSendSample.recommendation)
+            // const recommendObj = JSON.parse(toSendSample.recommendation)
             const newJSON =
                 {reg_num: toSendSample.reg_num , department: toSendSample.department,
 
-                    school: recommendObj.Info ? recommendObj.Info : 'UNIZIK',
-                        // (toSendSample.phone).toString() ==="1" ? "UMUNZE" :
-                        //     ((toSendSample.phone).toString()  ==="2" ? "AUCHI":(t(toSendSample.phone).toString()  ==="3" ? "POPE JOHN" : "ESCET"))) : 'UNIZIK' ) ,
+                    // school: recommendObj.Info ? recommendObj.Info : 'UNIZIK',
+                         school: phone ? (
+                                     (phone).toString() ==="1" ? "UMUNZE" :
+                                         ((phone.toString()  ==="2" ? "AUCHI":(phone.toString()  ==="3" ? "POPE JOHN" : "ESCET"))) ): 'UNIZIK' ,
                     student_type: toSendSample.student_type,
                     recommendation: toSendSample.recommendation, qualified: toSendSample.qualified}
-                    try {
-                        const newnewJSON =
-                    {reg_num: toSendSample['reg_num'] , department: toSendSample['department'],
+                    // try {
+                    //     const newnewJSON =
+                    // {reg_num: toSendSample['reg_num'] , department: toSendSample['department'],
     
-                        school: (toSendSample['phone'] ? (
-                            (toSendSample['phone']).toString() ==="1" ? "UMUNZE" :
-                                ((toSendSample['phone']).toString()  ==="2" ? "AUCHI":(t(toSendSample['phone']).toString()  ==="3" ? "POPE JOHN" : "ESCET"))) : 'UNIZIK' ) ,
-                        student_type: toSendSample['student_type'],
-                        recommendation: toSendSample['recommendation'], qualified: toSendSample['qualified']}
-                        console.log("newnewJSON from MainUTMETable",newnewJSON)
-                    } catch (error) {
-                        console.log('newnew',error)
-                    }
+                    //     school: (toSendSample['phone'] ? (
+                    //         (toSendSample['phone']).toString() ==="1" ? "UMUNZE" :
+                    //             ((toSendSample['phone']).toString()  ==="2" ? "AUCHI":(t(toSendSample['phone']).toString()  ==="3" ? "POPE JOHN" : "ESCET"))) : 'UNIZIK' ) ,
+                    //     student_type: toSendSample['student_type'],
+                    //     recommendation: toSendSample['recommendation'], qualified: toSendSample['qualified']}
+                    //     console.log("newnewJSON from MainUTMETable",newnewJSON)
+                    // } catch (error) {
+                    //     console.log('newnew',error)
+                    // }
             
 
             const h1 = crypto.createHash('sha1').update(`${JSON.stringify(newJSON)}`).digest('hex')
@@ -2171,7 +2172,7 @@ async function onStudentsRecordSendSave(req, res) {
             batchCondition[1] = i
             const response = await requestWithRetry (i,aRegNo,type, projectManagers)
             // console.log("this is projectManagers", projectManagers)
-            await saveDetailsOfPush('SAVEUTMESTATUS', projectManagers[itemNo])
+            await saveDetailsOfPush('SAVEUTMESTATUS', projectManagers[itemNo], regNoList[i]['phone'])
             // pushDataProcessed[type].push(aRegNo)
 
 
@@ -3072,11 +3073,11 @@ async function postChukaBatch_with_retry (projectMList) {
     }
 }
 
-async function saveDetailsOfPush(type,toSendSample) {
+async function saveDetailsOfPush(type,toSendSample, phone) {
     // makeConnection()
 
     // if (await checkTableExists(`uaras_saved_utme_candidate_status`)) {
-    await matchUTMECandidateHashSaved(type,`uaras_saved_utme_candidate_status`,toSendSample)
+    await matchUTMECandidateHashSaved(type,`uaras_saved_utme_candidate_status`,toSendSample, phone)
 
     // }
     // else {
