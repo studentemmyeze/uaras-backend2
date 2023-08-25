@@ -209,7 +209,9 @@ const updatedData = {"UTME":[], "DE":[], "PRE":[],"JUPEB":[],"SUP":[], "POSTUTME
 const totalTempDataProcessed = {"UTME":[], "DE":[], "PRE":[],"JUPEB":[],"SUP":[], "POSTUTME":[], "SAVEUTMESTATUS": []};
 const dataNotProcessed = {"UTME":[], "DE":[], "PRE":[],"JUPEB":[],"SUP":[], "POSTUTME":[], "SAVEUTMESTATUS": []};
 const time_taken_string = {"UTME":'', "DE":'', "PRE":'',"JUPEB":'',"SUP":'', "POSTUTME":'', "SAVEUTMESTATUS": []};
-const date_start = {"UTME":new Date(), "DE":new Date(), "PRE":new Date(),"JUPEB":new Date(),"SUP":new Date(), "POSTUTME":new Date()};
+const date_start = {"UTME":new Date(), "DE":new Date(), "PRE":new Date(),"JUPEB":new Date(),"SUP":new Date(), 
+                    "POSTUTME":new Date()};
+                    // 'PushUTME': new Date(), 'PushDE': new Date()};
 
 // try {
 //   var data = fs.readFileSync('settings.txt', 'utf8');
@@ -493,6 +495,14 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample) {
         // reg_num, department, school, student_type, recommendation, qualified
         // console.log('at saved::', toSendSample)
         const r1 = await recordsFromATableGrab(type,toSendSample.reg_num, tableName)
+
+        atype2 ==="1" ? "UMUNZE" :
+                  (atype2 ==="2" ? "AUCHI":(atype2 ==="3" ? "POPE JOHN" : "ESCET"))
+                  type2 = toSend[0]['phone'] ? toSend[0]['phone'] : 0
+
+
+
+
         if (r1.length > 0) {
             const newJSON =
                 {reg_num: toSendSample.reg_num , department: toSendSample.department,
@@ -502,11 +512,20 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample) {
                             ((toSendSample.phone).toString()  ==="2" ? "AUCHI":(t(toSendSample.phone).toString()  ==="3" ? "POPE JOHN" : "ESCET"))) : 'UNIZIK' ) ,
                     student_type: toSendSample.student_type,
                     recommendation: toSendSample.recommendation, qualified: toSendSample.qualified}
+            const newnewJSON =
+                    {reg_num: toSendSample['reg_num'] , department: toSendSample['department'],
+    
+                        school: (toSendSample['phone'] ? (
+                            (toSendSample['phone']).toString() ==="1" ? "UMUNZE" :
+                                ((toSendSample['phone']).toString()  ==="2" ? "AUCHI":(t(toSendSample['phone']).toString()  ==="3" ? "POPE JOHN" : "ESCET"))) : 'UNIZIK' ) ,
+                        student_type: toSendSample['student_type'],
+                        recommendation: toSendSample['recommendation'], qualified: toSendSample['qualified']}
 
             const h1 = crypto.createHash('sha1').update(`${JSON.stringify(newJSON)}`).digest('hex')
             const h2 = crypto.createHash('sha1').update(`${JSON.stringify(r1[0])}`).digest('hex')
             // console.log("r1 from SavedTable::",r1[0])
-            // console.log("newJSON from MainUTMETable",newJSON)
+            console.log("newJSON from MainUTMETable",newJSON)
+            console.log("newJSON from MainUTMETable",newnewJSON)
 
             if (h1 !== h2) {
                 console.log("not equal")
@@ -1274,9 +1293,12 @@ async function addRecords(type,tableName, schoolType = '') {
     }
 }
 
-function getTimeTaken() {
+function getTimeTaken(push = false) {
     let date_end = new Date();
-    let time_taken  = date_end - date_start[type]
+    let time_taken = 0
+    if (!push) {time_taken  = date_end - date_start[type]}
+    else {time_taken  = date_end - pushDate_start[type]}
+    // let time_taken  = date_end - date_start[type]
     let  totalSeconds = Math.floor(time_taken/1000)
 
     let hours = Math.floor(totalSeconds/3600);
@@ -1341,7 +1363,7 @@ function resetPushVariables(type) {
     pushDataNotProcessed[type] = []
     pushDataTotal2Push[type] = []
     pushTime_taken_string[type] = ''
-    date_start[type] = new Date()
+    pushDate_start[type] = new Date()
 }
 
 function resetVariables(type) {
@@ -2207,7 +2229,7 @@ async function onStudentsRecordSendSave(req, res) {
         console.log(issuesBatches)
         console.log("ISSUES----------")
 
-        pushTime_taken_string[type] = getTimeTaken();
+        pushTime_taken_string[type] = getTimeTaken(true);
         pushStatus[type] = 'success'
 
         try {
