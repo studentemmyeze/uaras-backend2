@@ -496,9 +496,9 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample) {
         // console.log('at saved::', toSendSample)
         const r1 = await recordsFromATableGrab(type,toSendSample.reg_num, tableName)
 
-        atype2 ==="1" ? "UMUNZE" :
-                  (atype2 ==="2" ? "AUCHI":(atype2 ==="3" ? "POPE JOHN" : "ESCET"))
-                  type2 = toSend[0]['phone'] ? toSend[0]['phone'] : 0
+        // atype2 ==="1" ? "UMUNZE" :
+        //           (atype2 ==="2" ? "AUCHI":(atype2 ==="3" ? "POPE JOHN" : "ESCET"))
+        //           type2 = toSend[0]['phone'] ? toSend[0]['phone'] : 0
 
 
 
@@ -507,12 +507,13 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample) {
             const newJSON =
                 {reg_num: toSendSample.reg_num , department: toSendSample.department,
 
-                    school: (toSendSample.phone ? (
-                        (toSendSample.phone).toString() ==="1" ? "UMUNZE" :
-                            ((toSendSample.phone).toString()  ==="2" ? "AUCHI":(t(toSendSample.phone).toString()  ==="3" ? "POPE JOHN" : "ESCET"))) : 'UNIZIK' ) ,
+                    school: toSendSample.recommendation.Info ? toSendSample.recommendation.Info : 'UNIZIK',
+                        // (toSendSample.phone).toString() ==="1" ? "UMUNZE" :
+                        //     ((toSendSample.phone).toString()  ==="2" ? "AUCHI":(t(toSendSample.phone).toString()  ==="3" ? "POPE JOHN" : "ESCET"))) : 'UNIZIK' ) ,
                     student_type: toSendSample.student_type,
                     recommendation: toSendSample.recommendation, qualified: toSendSample.qualified}
-            const newnewJSON =
+                    try {
+                        const newnewJSON =
                     {reg_num: toSendSample['reg_num'] , department: toSendSample['department'],
     
                         school: (toSendSample['phone'] ? (
@@ -520,12 +521,17 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample) {
                                 ((toSendSample['phone']).toString()  ==="2" ? "AUCHI":(t(toSendSample['phone']).toString()  ==="3" ? "POPE JOHN" : "ESCET"))) : 'UNIZIK' ) ,
                         student_type: toSendSample['student_type'],
                         recommendation: toSendSample['recommendation'], qualified: toSendSample['qualified']}
+                        console.log("newnewJSON from MainUTMETable",newnewJSON)
+                    } catch (error) {
+                        console.log('newnew',error)
+                    }
+            
 
             const h1 = crypto.createHash('sha1').update(`${JSON.stringify(newJSON)}`).digest('hex')
             const h2 = crypto.createHash('sha1').update(`${JSON.stringify(r1[0])}`).digest('hex')
             // console.log("r1 from SavedTable::",r1[0])
             console.log("newJSON from MainUTMETable",newJSON)
-            console.log("newJSON from MainUTMETable",newnewJSON)
+            
 
             if (h1 !== h2) {
                 console.log("not equal")
