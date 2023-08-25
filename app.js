@@ -509,7 +509,7 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample, phone) 
                 {reg_num: toSendSample.reg_num , department: toSendSample.department,
 
                     // school: recommendObj.Info ? recommendObj.Info : 'UNIZIK',
-                         school: phone ? (
+                         school: phone || phone !== '' ? (
                                      (phone).toString() ==="1" ? "UMUNZE" :
                                          ((phone.toString()  ==="2" ? "AUCHI":(phone.toString()  ==="3" ? "POPE JOHN" : "ESCET"))) ): 'UNIZIK' ,
                     student_type: toSendSample.student_type,
@@ -1126,7 +1126,7 @@ app.use((req, res, next) => {
     next();
 });
 
-async function addRecord2(type,tableName, toSendSample) {
+async function addRecord2(type,tableName, toSendSample, phone='') {
     // console.log("to send sample::", toSendSample)
     // console.log("to send reg no::", toSendSample.reg_num)
     queryTemp = `INSERT INTO ${tableName} (
@@ -1142,9 +1142,9 @@ async function addRecord2(type,tableName, toSendSample) {
  '${await checkForApostro(toSendSample.lga)}', '${toSendSample.subject_1}', ${toSendSample.subject_1_score},
  '${toSendSample.subject_2}', ${toSendSample.subject_2_score}, '${toSendSample.subject_3}',
  ${toSendSample.subject_3_score}, ${toSendSample.english_score},
- '${toSendSample.phone ? (
-        toSendSample.phone ==="1" ? "UMUNZE" :
-            (toSendSample.phone ==="2" ? "AUCHI":(toSendSample.phone ==="3" ? "POPE JOHN" : "ESCET"))) : 'UNIZIK'}',
+ '${(phone || phone !== '') ? (
+        phone ==="1" ? "UMUNZE" :
+            (phone ==="2" ? "AUCHI":(phone ==="3" ? "POPE JOHN" : "ESCET"))) : 'UNIZIK'}',
 
  ${toSendSample.student_type}, '${toSendSample.recommendation}', ${toSendSample.qualified}
 )`
@@ -2115,7 +2115,8 @@ async function onStudentsRecordSendSave(req, res) {
 
 
         pushStatus[type] = 'busy'
-
+        // uploadStatus[type] = 'busy'
+        pushStatusMessage[type] = 'busy'
 
 
         // type = "UTME"
@@ -2172,6 +2173,7 @@ async function onStudentsRecordSendSave(req, res) {
             batchCondition[1] = i
             const response = await requestWithRetry (i,aRegNo,type, projectManagers)
             // console.log("this is projectManagers", projectManagers)
+            console.log('phone::', regNoList[i]['phone'])
             await saveDetailsOfPush('SAVEUTMESTATUS', projectManagers[itemNo], regNoList[i]['phone'])
             // pushDataProcessed[type].push(aRegNo)
 
