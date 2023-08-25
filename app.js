@@ -504,10 +504,11 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample) {
 
 
         if (r1.length > 0) {
+            const recommendObj = JSON.parse(toSendSample.recommendation)
             const newJSON =
                 {reg_num: toSendSample.reg_num , department: toSendSample.department,
 
-                    school: toSendSample.recommendation.Info ? toSendSample.recommendation.Info : 'UNIZIK',
+                    school: recommendObj.Info ? recommendObj.Info : 'UNIZIK',
                         // (toSendSample.phone).toString() ==="1" ? "UMUNZE" :
                         //     ((toSendSample.phone).toString()  ==="2" ? "AUCHI":(t(toSendSample.phone).toString()  ==="3" ? "POPE JOHN" : "ESCET"))) : 'UNIZIK' ) ,
                     student_type: toSendSample.student_type,
@@ -2112,7 +2113,7 @@ async function onStudentsRecordSendSave(req, res) {
         resetPushVariables(type)
 
 
-
+        pushStatus[type] = 'busy'
 
 
 
