@@ -2999,7 +2999,7 @@ async function getAllRegNoMain(start, stop,
     // var type = "UTME"
     let queryTemp = '';
     if (start || stop) {
-        queryTemp = `SELECT reg_num FROM ${mainTableName[type]}
+        queryTemp = `SELECT reg_num, phone FROM ${mainTableName[type]}
   WHERE id >= ${start} `
         if (stop) {
             queryTemp +=  ` AND id <= ${stop}`;
