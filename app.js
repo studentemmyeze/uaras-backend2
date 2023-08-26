@@ -2206,13 +2206,15 @@ async function onStudentsRecordSendSave(req, res) {
 
                 // const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)
                 // if successful
-                if (answerToken.status) {
+                // if (answerToken.status) 
+                {
                     successBatchCount[type] = successBatchCount[type] + 1
                     let tempPushed = []
                     tempPushed = pushDataProcessed[type].concat(copyprojectManagers);
                     pushDataProcessed[type] = tempPushed
                 }
-                else {
+                // else 
+                {
                     let tempPushedNot = []
                     tempPushedNot = pushDataNotProcessed[type].concat(copyprojectManagers)
                     pushDataNotProcessed[type] = tempPushedNot
