@@ -2153,7 +2153,12 @@ async function onStudentsRecordSendSave(req, res) {
         var total = 0
         try {
             total = regNoList.length;
-            pushDataTotal2Push[type] = total
+            totalData = []
+            regNoList.forEach(e => {
+                totalData.push(e['reg_num'])
+
+            })
+            pushDataTotal2Push[type] = totalData
 
             // status: pushStatus[type],
             pushParams[type] = {'start' : start, 'stop': stop, 'dateLast': dateLast, 'batchsize': bSize, 'course': course}
@@ -2267,7 +2272,7 @@ async function onStudentsRecordSendSave(req, res) {
         console.log(issuesBatches)
         console.log("ISSUES----------")
 
-        pushTime_taken_string[type] = getTimeTaken(true);
+        pushTime_taken_string[type] = await getTimeTaken(true);
         pushStatus[type] = 'success'
 
         try {
