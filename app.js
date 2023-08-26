@@ -1301,7 +1301,7 @@ async function addRecords(type,tableName, schoolType = '') {
     }
 }
 
-function getTimeTaken(push = false) {
+async function getTimeTaken(push = false) {
     let date_end = new Date();
     let time_taken = 0
     if (!push) {time_taken  = date_end - date_start[type]}
@@ -1343,9 +1343,9 @@ function getStat(type) {
     return statusMessage
 }
 
-function getPushStat(type) {
+async function getPushStat(type) {
     if (pushStatus[type] !== 'ready' || pushStatus[type] !== 'success' ) {
-        time_taken_string[type] = getTimeTaken();
+        time_taken_string[type] =  await getTimeTaken();
     }
 
 
@@ -1370,7 +1370,7 @@ function resetPushVariables(type) {
     pushDataProcessed[type] = []
     pushDataNotProcessed[type] = []
     pushDataTotal2Push[type] = []
-    pushTime_taken_string[type] = ''
+    pushTime_taken_string[type] = '-'
     pushDate_start[type] = new Date()
 }
 
@@ -1452,7 +1452,7 @@ app.get('/api/status', (req, res, next) => {
     }
 })
 
-app.get('/api/push-status', (req, res, next) => {
+app.get('/api/push-status', async (req, res, next) => {
     // app.route('/api/status').get(onStatusQuery)
     // async function onStatusQuery(req, res) {
         console.log("request", req.query.type)
@@ -1480,7 +1480,7 @@ app.get('/api/push-status', (req, res, next) => {
     //   rowdata_processed_success: totalTempDataProcessed[type].length,
     //   rowdata_error: dataNotProcessed[type].length}
     // }
-            statusMessage = getPushStat(type)
+            statusMessage = await getPushStat(type)
         }
     
         try {
@@ -2141,8 +2141,12 @@ async function onStudentsRecordSendSave(req, res) {
 
 
 
-
-        await makeConnection()
+        try {
+            await makeConnection()
+        } catch (error) {
+            console.log('db connection error', error)
+        }
+        
         console.log("AWAIT REGNOS RESULT")
 
         const regNoList = await getAllRegNoMain(start, stop, dateLast, course, type)
@@ -2202,10 +2206,18 @@ async function onStudentsRecordSendSave(req, res) {
 
                 // const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)
                 // if successful
-                successBatchCount[type] = successBatchCount[type] + 1
-                pushDataProcessed[type].concat(copyprojectManagers)
-                // else
-                pushDataNotProcessed[type].concat(copyprojectManagers)
+                if (answerToken.status) {
+                    successBatchCount[type] = successBatchCount[type] + 1
+                    let tempPushed = []
+                    tempPushed = pushDataProcessed[type].concat(copyprojectManagers);
+                    pushDataProcessed[type] = tempPushed
+                }
+                else {
+                    let tempPushedNot = []
+                    tempPushedNot = pushDataNotProcessed[type].concat(copyprojectManagers)
+                    pushDataNotProcessed[type] = tempPushedNot
+                }
+                  
 
                 if (currentBatch === 1){
                     console.log(copyprojectManagers);
@@ -2221,11 +2233,19 @@ async function onStudentsRecordSendSave(req, res) {
                 const copyprojectManagers = projectManagers
                 // const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)// const waitanswer = await waitForServerProcess(delays)
                 console.log('total number sent in this batch::', copyprojectManagers.length)
-                // if successful
-                successBatchCount[type] = successBatchCount[type] + 1
-                pushDataProcessed[type].concat(copyprojectManagers)
-                // else
-                pushDataNotProcessed[type].concat(copyprojectManagers)
+                // if (answerToken.status) 
+                {
+                    successBatchCount[type] = successBatchCount[type] + 1
+                    let tempPushed = []
+                    tempPushed = pushDataProcessed[type].concat(copyprojectManagers);
+                    pushDataProcessed[type] = tempPushed
+                }
+                // else 
+                {
+                    let tempPushedNot = []
+                    tempPushedNot = pushDataNotProcessed[type].concat(copyprojectManagers)
+                    pushDataNotProcessed[type] = tempPushedNot
+                }
             }
             else{itemNo = itemNo + 1}
             console.log("COUNT OF PM::", itemNo)
@@ -2233,7 +2253,13 @@ async function onStudentsRecordSendSave(req, res) {
             // console.log("this is i", i)
 
         }
-        await closeConnection()
+
+        try {
+            await closeConnection()
+        } catch (error) {
+            console.log('db close error', error)
+        }
+        
 
         console.log("ISSUES----------")
         console.log(issuesBatches)
