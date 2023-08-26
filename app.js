@@ -1301,7 +1301,7 @@ async function addRecords(type,tableName, schoolType = '') {
     }
 }
 
-async function getTimeTaken(push = false) {
+async function getTimeTaken(type, push = false) {
     let date_end = new Date();
     let time_taken = 0
     if (!push) {time_taken  = date_end - date_start[type]}
@@ -1322,7 +1322,7 @@ async function getTimeTaken(push = false) {
 
 function getStat(type) {
     if (uploadStatus[type] !== 'ready' || uploadStatus[type] !== 'success' ) {
-        time_taken_string[type] = getTimeTaken();
+        time_taken_string[type] = getTimeTaken(type);
     }
 
 
@@ -1345,7 +1345,7 @@ function getStat(type) {
 
 async function getPushStat(type) {
     if (pushStatus[type] !== 'ready' || pushStatus[type] !== 'success' ) {
-        time_taken_string[type] =  await getTimeTaken();
+        time_taken_string[type] =  await getTimeTaken(type, true);
         console.log('time taken::',time_taken_string[type] )
     }
 
@@ -1569,7 +1569,7 @@ async function onFileupload(req, res) {
                 // closeConnection()
                 console.log("upload successful..")
                 uploadStatusMessage[type] += '\n upload successful'
-                time_taken_string[type] = getTimeTaken();
+                time_taken_string[type] = await getTimeTaken(type);
                 uploadStatus[type] = 'success'
                 lastOpStat = getStat(type)
             } catch (error) {
@@ -1644,7 +1644,7 @@ async function onFileupload2(req, res) {
 
     closeConnection()
 
-    time_taken_string[type] = getTimeTaken();
+    time_taken_string[type] = getTimeTaken(type);
     uploadStatus[type] = 'success'
 
 
@@ -1664,7 +1664,7 @@ async function onFileupload2(req, res) {
 
 app.route('/api/uploaddecandidate').post(onFileuploadDE)
 async function onFileuploadDE(req, res) {
-    type ='DE'
+    let type ='DE'
     var schoolType = req.body.type
     console.log("IN DE")
 
@@ -1689,7 +1689,7 @@ async function onFileuploadDE(req, res) {
 
 
         await getExcelData(type, req.files.file.data)
-        makeConnection()
+        await makeConnection()
         // check if temp table exists // delete if it exists
         if (await checkTableExists(tempTableName[type])) {await deleteTable(tempTableName[type])}
         // create temp table
@@ -1714,7 +1714,7 @@ async function onFileuploadDE(req, res) {
 
         closeConnection()
 
-        time_taken_string[type] = getTimeTaken();
+        time_taken_string[type] = await getTimeTaken(type);
         uploadStatus[type] = 'success'
 
 
@@ -1766,7 +1766,7 @@ async function onFileuploadPRE(req, res) {
 
     closeConnection()
 
-    time_taken_string[type] = getTimeTaken();
+    time_taken_string[type] = getTimeTaken(type);
     uploadStatus[type] = 'success'
 
 
@@ -1909,7 +1909,7 @@ async function onFileuploadPOSTUTME(req, res) {
 
     closeConnection()
 
-    time_taken_string[type] = getTimeTaken();
+    time_taken_string[type] = getTimeTaken(type);
     uploadStatus[type] = 'success'
 
     try {
@@ -2273,7 +2273,7 @@ async function onStudentsRecordSendSave(req, res) {
         console.log(issuesBatches)
         console.log("ISSUES----------")
 
-        pushTime_taken_string[type] = await getTimeTaken(true);
+        pushTime_taken_string[type] = await getTimeTaken(type,true);
         pushStatus[type] = 'success'
 
         try {
