@@ -1346,6 +1346,7 @@ function getStat(type) {
 async function getPushStat(type) {
     if (pushStatus[type] !== 'ready' || pushStatus[type] !== 'success' ) {
         time_taken_string[type] =  await getTimeTaken();
+        console.log('time taken::',time_taken_string[type] )
     }
 
 
