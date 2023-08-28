@@ -2107,6 +2107,7 @@ async function postChukaBatch(batchList, cPM)  {
             .then(response => response.json())
             .then(data => {
                 console.log("received from qualified upload", data);
+                return {status: 200}
 
 
 
