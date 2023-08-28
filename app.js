@@ -1320,9 +1320,9 @@ async function getTimeTaken(type, push = false) {
     return Atime_taken_string
 }
 
-function getStat(type) {
+async function getStat(type) {
     if (uploadStatus[type] !== 'ready' || uploadStatus[type] !== 'success' ) {
-        time_taken_string[type] = getTimeTaken(type);
+        time_taken_string[type] = await getTimeTaken(type);
     }
 
 
@@ -1411,7 +1411,7 @@ var batchCondition = [0,0,0]
 // })
 
 
-app.get('/api/status', (req, res, next) => {
+app.get('/api/status', async (req, res, next) => {
 // app.route('/api/status').get(onStatusQuery)
 // async function onStatusQuery(req, res) {
     console.log("request", req.query.type)
@@ -1439,7 +1439,7 @@ app.get('/api/status', (req, res, next) => {
 //   rowdata_processed_success: totalTempDataProcessed[type].length,
 //   rowdata_error: dataNotProcessed[type].length}
 // }
-        statusMessage = getStat(type)
+        statusMessage = await getStat(type)
     }
 
     try {
