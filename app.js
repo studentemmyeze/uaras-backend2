@@ -2269,14 +2269,14 @@ async function onStudentsRecordSendSave(req, res) {
                     let tempPushed = []
                     tempPushed = pushDataProcessed[type].concat(copyprojectManagers);
                     pushDataProcessed[type] = tempPushed
-                    pushStatusMessage[type] = pushStatusMessage[type] + `\nbatch ${currentBatch} send to Chuka successful!`
+                    // pushStatusMessage[type] = pushStatusMessage[type] + `\nbatch ${currentBatch} send to Chuka successful!`
                 }
                 // else 
                 {
                     let tempPushedNot = []
                     tempPushedNot = pushDataNotProcessed[type].concat(copyprojectManagers)
                     pushDataNotProcessed[type] = tempPushedNot
-                    pushStatusMessage[type] = pushStatusMessage[type] + `\nbatch ${currentBatch} send to Chuka not successful!`
+                    // pushStatusMessage[type] = pushStatusMessage[type] + `\nbatch ${currentBatch} send to Chuka not successful!`
                 }
             }
             else{itemNo = itemNo + 1}
