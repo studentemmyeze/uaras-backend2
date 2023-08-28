@@ -2057,6 +2057,7 @@ async function onSuggestFromPython(aJSON) {
 
 async function postChukaBatch(batchList, cPM)  {
     let successM = true;
+    let answerMessage = {};
     const headers = {
         "content-Type": "application/json",
         accept: 'application/json'
@@ -2107,7 +2108,7 @@ async function postChukaBatch(batchList, cPM)  {
             .then(response => response.json())
             .then(data => {
                 console.log("received from qualified upload", data);
-                return {status: 200}
+                answerMessage = {status: 200}
 
 
 
@@ -2123,7 +2124,7 @@ async function postChukaBatch(batchList, cPM)  {
 
     }
 
-    // return successM
+    return answerMessage
 
 }
 
