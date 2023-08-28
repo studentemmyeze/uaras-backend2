@@ -3072,7 +3072,7 @@ async function getAllRegNoMain(start, stop,
     let queryTemp = '';
     if (start || stop || dateLast || course) {
         queryTemp = `SELECT reg_num, phone FROM ${mainTableName[type]}
-  WHERE id >= ${start} `
+  WHERE id >= ${start ? start : 0} `
         if (stop) {
             queryTemp +=  ` AND id <= ${stop}`;
         }
