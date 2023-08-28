@@ -532,7 +532,7 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample, phone) 
             const h1 = crypto.createHash('sha1').update(`${JSON.stringify(newJSON)}`).digest('hex')
             const h2 = crypto.createHash('sha1').update(`${JSON.stringify(r1[0])}`).digest('hex')
             // console.log("r1 from SavedTable::",r1[0])
-            console.log("newJSON from MainUTMETable",newJSON)
+            // console.log("newJSON from MainUTMETable",newJSON)
             
 
             if (h1 !== h2) {
@@ -2218,21 +2218,6 @@ async function onStudentsRecordSendSave(req, res) {
             // console.log("this is projectManagers", projectManagers)
             // console.log('phone::', regNoList[i]['phone'])
             await saveDetailsOfPush('SAVEUTMESTATUS', projectManagers[itemNo], regNoList[i]['phone'])
-            // pushDataProcessed[type].push(aRegNo)
-
-
-        //     status: pushStatus[type],
-        // pushParams: pushParams[type],
-        // status_message: pushStatusMessage[type],
-        // time_taken: pushTime_taken_string[type],
-        // total_rowdata_pushed_to_api: ,
-        // total_successful_batch: 
-        // total_error:
-        // total2push:
-        // type:type
-
-
-
 
             if (i % batchNo === 0 && i !== 0) {
                 currentBatch += 1
@@ -2243,9 +2228,9 @@ async function onStudentsRecordSendSave(req, res) {
                 itemNo = 0
                 // await waitForServerProcess(delays)
 
-                // const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)
+                const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)
                 // if successful
-                // if (answerToken.status) 
+                if (answerToken.status) 
                 {
                     successBatchCount[type] = successBatchCount[type] + 1
                     let tempPushed = []
@@ -2253,7 +2238,7 @@ async function onStudentsRecordSendSave(req, res) {
                     pushDataProcessed[type] = tempPushed
                     pushStatusMessage[type] = pushStatusMessage[type] + `\nbatch ${currentBatch} send to Chuka successful!`
                 }
-                // else 
+                else 
                 {
                     let tempPushedNot = []
                     tempPushedNot = pushDataNotProcessed[type].concat(copyprojectManagers)
@@ -2274,9 +2259,9 @@ async function onStudentsRecordSendSave(req, res) {
                 batchCondition[0] = currentBatch
                 // await waitForServerProcess(delays)
                 const copyprojectManagers = projectManagers
-                // const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)// const waitanswer = await waitForServerProcess(delays)
+                const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)// const waitanswer = await waitForServerProcess(delays)
                 console.log('total number sent in this batch::', copyprojectManagers.length)
-                // if (answerToken.status) 
+                if (answerToken.status) 
                 {
                     successBatchCount[type] = successBatchCount[type] + 1
                     let tempPushed = []
@@ -2284,7 +2269,7 @@ async function onStudentsRecordSendSave(req, res) {
                     pushDataProcessed[type] = tempPushed
                     pushStatusMessage[type] = pushStatusMessage[type] + `\nbatch ${currentBatch} send to Chuka successful!`
                 }
-                // else 
+                else 
                 {
                     let tempPushedNot = []
                     tempPushedNot = pushDataNotProcessed[type].concat(copyprojectManagers)
