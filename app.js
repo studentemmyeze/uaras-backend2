@@ -1536,6 +1536,13 @@ async function onFileupload(req, res) {
                 // makeConnection()
                 uploadStatus[type] = 'busy'
                 uploadStatusMessage[type] = 'busy'
+                try {
+                    await makeConnection()
+                    uploadStatusMessage[type] = uploadStatusMessage[type] + '\connecting to the DB'
+                    
+                } catch (error) {
+                    console.log('db connection error', error)
+                }
 
                 // check if temp table exists // delete if it exists
                 if (await checkTableExists(tempTableName[type])) {
@@ -1572,6 +1579,13 @@ async function onFileupload(req, res) {
                 time_taken_string[type] = await getTimeTaken(type);
                 uploadStatus[type] = 'success'
                 lastOpStat = getStat(type)
+                try {
+                    await closeConnection()
+                    uploadStatusMessage[type] = uploadStatusMessage[type] + '\closing the DB'
+                    
+                } catch (error) {
+                    console.log('db closing error', error)
+                }
             } catch (error) {
                 uploadSuccess = false;
                 console.log("error writing to the database ..")
@@ -1689,7 +1703,17 @@ async function onFileuploadDE(req, res) {
 
 
         await getExcelData(type, req.files.file.data)
-        await makeConnection()
+
+
+        try {
+            await makeConnection()
+            uploadStatusMessage[type] = uploadStatusMessage[type] + '\connecting to the DB'
+            
+        } catch (error) {
+            console.log('db connection error', error)
+        }
+
+
         // check if temp table exists // delete if it exists
         if (await checkTableExists(tempTableName[type])) {await deleteTable(tempTableName[type])}
         // create temp table
@@ -1712,7 +1736,13 @@ async function onFileuploadDE(req, res) {
         }
         console.log("IN DE- after check if main table exists")
 
-        closeConnection()
+        try {
+            await closeConnection()
+            uploadStatusMessage[type] = uploadStatusMessage[type] + '\closing the DB'
+            
+        } catch (error) {
+            console.log('db closing error', error)
+        }
 
         time_taken_string[type] = await getTimeTaken(type);
         uploadStatus[type] = 'success'
@@ -2117,7 +2147,7 @@ async function onStudentsRecordSendSave(req, res) {
 
         pushStatus[type] = 'busy'
         // uploadStatus[type] = 'busy'
-        pushStatusMessage[type] = 'busy'
+        pushStatusMessage[type] = pushStatusMessage[type] + '\nbusy'
 
 
         // type = "UTME"
@@ -2144,6 +2174,8 @@ async function onStudentsRecordSendSave(req, res) {
 
         try {
             await makeConnection()
+            pushStatusMessage[type] = pushStatusMessage[type] + '\connecting to the DB'
+            
         } catch (error) {
             console.log('db connection error', error)
         }
@@ -2160,6 +2192,7 @@ async function onStudentsRecordSendSave(req, res) {
 
             })
             pushDataTotal2Push[type] = totalData
+            pushStatusMessage[type] = pushStatusMessage[type] + `\nfound ${total} records`
 
             // status: pushStatus[type],
             pushParams[type] = {'start' : start, 'stop': stop, 'dateLast': dateLast, 'batchsize': bSize, 'course': course}
@@ -2176,7 +2209,7 @@ async function onStudentsRecordSendSave(req, res) {
             await createTable(type,`uaras_saved_utme_candidate_status`)
 
         }
-
+        pushStatusMessage[type] = pushStatusMessage[type] + '\nstarting retrieve, save and push to Chuka'
         for (let i = 0; i < total ; i++) {
 
             const aRegNo = regNoList[i]['reg_num']
@@ -2218,19 +2251,21 @@ async function onStudentsRecordSendSave(req, res) {
                     let tempPushed = []
                     tempPushed = pushDataProcessed[type].concat(copyprojectManagers);
                     pushDataProcessed[type] = tempPushed
+                    pushStatusMessage[type] = pushStatusMessage[type] + `\nbatch ${currentBatch} send to Chuka successful!`
                 }
                 // else 
                 {
                     let tempPushedNot = []
                     tempPushedNot = pushDataNotProcessed[type].concat(copyprojectManagers)
                     pushDataNotProcessed[type] = tempPushedNot
+                    pushStatusMessage[type] = pushStatusMessage[type] + `\nbatch ${currentBatch} send to Chuka not successful!`
                 }
                   
 
-                if (currentBatch === 1){
-                    console.log(copyprojectManagers);
+                // if (currentBatch === 1){
+                    // console.log(copyprojectManagers);
 
-                }
+                // }
                 // issuesBatches = []
 
             }
@@ -2247,12 +2282,14 @@ async function onStudentsRecordSendSave(req, res) {
                     let tempPushed = []
                     tempPushed = pushDataProcessed[type].concat(copyprojectManagers);
                     pushDataProcessed[type] = tempPushed
+                    pushStatusMessage[type] = pushStatusMessage[type] + `\nbatch ${currentBatch} send to Chuka successful!`
                 }
                 // else 
                 {
                     let tempPushedNot = []
                     tempPushedNot = pushDataNotProcessed[type].concat(copyprojectManagers)
                     pushDataNotProcessed[type] = tempPushedNot
+                    pushStatusMessage[type] = pushStatusMessage[type] + `\nbatch ${currentBatch} send to Chuka not successful!`
                 }
             }
             else{itemNo = itemNo + 1}
@@ -2264,6 +2301,7 @@ async function onStudentsRecordSendSave(req, res) {
 
         try {
             await closeConnection()
+            pushStatusMessage[type] = pushStatusMessage[type] + `\nClosing the DB`
         } catch (error) {
             console.log('db close error', error)
         }
