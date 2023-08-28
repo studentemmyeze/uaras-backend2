@@ -1321,7 +1321,7 @@ async function getTimeTaken(type, push = false) {
 }
 
 async function getStat(type) {
-    if (uploadStatus[type] !== 'ready' || uploadStatus[type] !== 'success' ) {
+    if (uploadStatus[type] !== 'ready' && uploadStatus[type] !== 'success' ) {
         time_taken_string[type] = await getTimeTaken(type);
     }
 
@@ -1344,7 +1344,7 @@ async function getStat(type) {
 }
 
 async function getPushStat(type) {
-    if (pushStatus[type] !== 'ready' || pushStatus[type] !== 'success' ) {
+    if (pushStatus[type] !== 'ready' && pushStatus[type] !== 'success' ) {
         pushTime_taken_string[type] =  await getTimeTaken(type, true);
         // console.log('time taken::',pushTime_taken_string[type] )
     }
