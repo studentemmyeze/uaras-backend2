@@ -262,12 +262,16 @@ async function makeConnection() {
 }
 
 async function closeConnection() {
-    connection.end(function(err) {
-        if (err) {
-            return console.log('error:' + err.message);
-        }
-        console.log('Close the database connection.');
-    });
+    if (isConnectedToDB) {
+        connection.end(function(err) {
+            if (err) {
+                return console.log('error:' + err.message);
+            }
+            console.log('Close the database connection.');
+        });
+        isConnectedToDB = false;
+    }
+    
 }
 
 
@@ -2249,10 +2253,10 @@ async function onStudentsRecordSendSave(req, res) {
                 }
                   
 
-                if (currentBatch === 1){
-                    console.log(copyprojectManagers);
+                // if (currentBatch === 1){
+                //     console.log(copyprojectManagers);
 
-                }
+                // }
                 // issuesBatches = []
 
             }
