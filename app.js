@@ -290,7 +290,7 @@ async function updateStudentRecordSave(type,tableName,toSendSample) {
     WHERE reg_num = '${toSendSample.reg_num}';`;
     }
 
-    console.log("update query::", queryTemp)
+    // console.log("update query::", queryTemp)
 
     await doQuery(queryTemp)
 }
@@ -1149,7 +1149,7 @@ async function addRecord2(type,tableName, toSendSample, phone='') {
  ${toSendSample.student_type}, '${toSendSample.recommendation}', ${toSendSample.qualified}
 )`
 
-console.log(queryTemp)
+// console.log(queryTemp)
 // console.log("\n")
     await doQuery(queryTemp)
 }
@@ -2230,9 +2230,9 @@ async function onStudentsRecordSendSave(req, res) {
                 itemNo = 0
                 // await waitForServerProcess(delays)
 
-                // const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)
+                const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)
                 // if successful
-                // if (answerToken.status) 
+                if (answerToken.status) 
                 {
                     successBatchCount[type] = successBatchCount[type] + 1
                     let tempPushed = []
@@ -2240,7 +2240,7 @@ async function onStudentsRecordSendSave(req, res) {
                     pushDataProcessed[type] = tempPushed
                     pushStatusMessage[type] = pushStatusMessage[type] + `\nbatch ${currentBatch} send to Chuka successful!`
                 }
-                // else 
+                else 
                 {
                     let tempPushedNot = []
                     tempPushedNot = pushDataNotProcessed[type].concat(copyprojectManagers)
@@ -2261,9 +2261,9 @@ async function onStudentsRecordSendSave(req, res) {
                 batchCondition[0] = currentBatch
                 // await waitForServerProcess(delays)
                 const copyprojectManagers = projectManagers
-                // const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)// const waitanswer = await waitForServerProcess(delays)
+                const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)// const waitanswer = await waitForServerProcess(delays)
                 console.log('total number sent in this batch::', copyprojectManagers.length)
-                // if (answerToken.status) 
+                if (answerToken.status) 
                 {
                     successBatchCount[type] = successBatchCount[type] + 1
                     let tempPushed = []
@@ -2271,7 +2271,7 @@ async function onStudentsRecordSendSave(req, res) {
                     pushDataProcessed[type] = tempPushed
                     // pushStatusMessage[type] = pushStatusMessage[type] + `\nbatch ${currentBatch} send to Chuka successful!`
                 }
-                // else 
+                else 
                 {
                     let tempPushedNot = []
                     tempPushedNot = pushDataNotProcessed[type].concat(copyprojectManagers)
