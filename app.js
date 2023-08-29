@@ -251,14 +251,18 @@ const connection = mysql.createConnection({
 
 
 async function makeConnection() {
-    connection.connect(function(err) {
-        if (err) {
-            return console.error('error: ' + err.message);
-        }
-
-        console.log('Connected to the MySQL server.');
-        isConnectedToDB = true;
-    });
+    if (!isConnectedToDB) {
+        connection.connect(function(err) {
+        
+            if (err) {
+                return console.error('error: ' + err.message);
+            }
+    
+            console.log('Connected to the MySQL server.');
+            isConnectedToDB = true;
+        });
+    }
+    
 }
 
 async function closeConnection() {
@@ -1582,7 +1586,7 @@ async function onFileupload(req, res) {
                 uploadStatusMessage[type] += '\n upload successful'
                 time_taken_string[type] = await getTimeTaken(type);
                 uploadStatus[type] = 'success'
-                lastOpStat = getStat(type)
+                lastOpStat = await getStat(type)
                 try {
                     await closeConnection()
                     uploadStatusMessage[type] = uploadStatusMessage[type] + '\closing the DB'
@@ -1750,6 +1754,7 @@ async function onFileuploadDE(req, res) {
 
         time_taken_string[type] = await getTimeTaken(type);
         uploadStatus[type] = 'success'
+        lastOpStat = await getStat(type)
 
 
         try {
