@@ -1142,7 +1142,7 @@ async function addRecord2(type,tableName, toSendSample, phone='') {
  '${await checkForApostro(toSendSample.lga)}', '${toSendSample.subject_1}', ${toSendSample.subject_1_score},
  '${toSendSample.subject_2}', ${toSendSample.subject_2_score}, '${toSendSample.subject_3}',
  ${toSendSample.subject_3_score}, ${toSendSample.english_score},
- '${(phone || phone !== '') ? (
+ '${(phone && phone !== '') ? (
         phone ==="1" ? "UMUNZE" :
             (phone ==="2" ? "AUCHI":(phone ==="3" ? "POPE JOHN" : "ESCET"))) : 'UNIZIK'}',
 
