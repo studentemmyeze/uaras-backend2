@@ -509,7 +509,7 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample, phone) 
                 {reg_num: toSendSample.reg_num , department: toSendSample.department,
 
                     // school: recommendObj.Info ? recommendObj.Info : 'UNIZIK',
-                         school: phone || phone !== '' ? (
+                         school: phone && phone !== '' ? (
                                      (phone).toString() ==="1" ? "UMUNZE" :
                                          ((phone.toString()  ==="2" ? "AUCHI":(phone.toString()  ==="3" ? "POPE JOHN" : "ESCET"))) ): 'UNIZIK' ,
                     student_type: toSendSample.student_type,
@@ -3176,7 +3176,7 @@ async function getStudentRegistrationInfo(ii,regNo, type, projectM) {
             subject_3_score: '',
             english_score: '',
             student_type:2,
-            recommendation: {},
+            recommendation: JSON.stringify({}),
             qualified: 1
 
 
