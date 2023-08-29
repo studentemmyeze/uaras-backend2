@@ -1138,10 +1138,10 @@ async function addRecord2(type,tableName, toSendSample, phone='') {
  '${await checkForApostro(toSendSample.firstname)}',
  '${await checkForApostro(toSendSample.middlename)}',
  '${toSendSample.sex}', '${await checkForApostro(toSendSample.state)}',
- ${toSendSample.utme_aggregate}, '${await checkForApostro(toSendSample.department)}', '${toSendSample.faculty}',
- '${await checkForApostro(toSendSample.lga)}', '${toSendSample.subject_1}', ${toSendSample.subject_1_score},
- '${toSendSample.subject_2}', ${toSendSample.subject_2_score}, '${toSendSample.subject_3}',
- ${toSendSample.subject_3_score}, ${toSendSample.english_score},
+ ${toSendSample.utme_aggregate ? toSendSample.utme_aggregate : 0}, '${await checkForApostro(toSendSample.department)}', '${toSendSample.faculty}',
+ '${await checkForApostro(toSendSample.lga)}', '${toSendSample.subject_1}', ${toSendSample.subject_1_score ? toSendSample.subject_1_score : 0},
+ '${toSendSample.subject_2}', ${toSendSample.subject_2_score ? toSendSample.subject_2_score : 0}, '${toSendSample.subject_3}',
+ ${toSendSample.subject_3_score ? toSendSample.subject_3_score : 0}, ${toSendSample.english_score ? toSendSample.english_score : 0},
  '${(phone && phone !== '') ? (
         phone ==="1" ? "UMUNZE" :
             (phone ==="2" ? "AUCHI":(phone ==="3" ? "POPE JOHN" : "ESCET"))) : 'UNIZIK'}',
