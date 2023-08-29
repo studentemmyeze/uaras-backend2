@@ -544,7 +544,7 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample, phone) 
         }
         else {
             try {
-                await addRecord2(type,tableName,toSendSample)
+                await addRecord2(type,tableName,toSendSample, phone)
                 updatedData[type].push(toSendSample.reg_num)
             } catch (error) {
                 dataNotProcessed[type].push(toSendSample.reg_num)
@@ -1149,7 +1149,7 @@ async function addRecord2(type,tableName, toSendSample, phone='') {
  ${toSendSample.student_type}, '${toSendSample.recommendation}', ${toSendSample.qualified}
 )`
 
-// console.log(queryTemp)
+console.log(queryTemp)
 // console.log("\n")
     await doQuery(queryTemp)
 }
