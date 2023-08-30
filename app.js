@@ -2259,7 +2259,7 @@ async function onStudentsRecordSendSave(req, res) {
                   
 
                 // if (currentBatch === 1){
-                //     console.log(copyprojectManagers);
+                    console.log('batch sample::',copyprojectManagers[0]);
 
                 // }
                 // issuesBatches = []
@@ -3311,7 +3311,7 @@ async function getStudentRegistrationInfo(ii,regNo, type, projectM) {
 
                         }
 
-                        console.log("TO SEND2", toSend2)
+                        // console.log("TO SEND2", toSend2)
 
                         if (toSend2) {
                             // p2[ii+1] = toSend2
