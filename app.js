@@ -507,10 +507,10 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample, phone) 
         // atype2 ==="1" ? "UMUNZE" :
         //           (atype2 ==="2" ? "AUCHI":(atype2 ==="3" ? "POPE JOHN" : "ESCET"))
         //           type2 = toSend[0]['phone'] ? toSend[0]['phone'] : 0
-        console.log('r1::', r1)
-        console.log('r1[0]::', r1[0])
-        console.log('this is phone::', (phone))
-        console.log('this is phone to string::', isNullOrUndefined(phone))
+        // console.log('r1::', r1)
+        // console.log('r1[0]::', r1[0])
+        // console.log('this is phone::', (phone))
+        // console.log('this is phone to string::', isNullOrUndefined(phone))
 
 
         if (r1.length > 0) {
@@ -543,9 +543,9 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample, phone) 
             const h2 = crypto.createHash('sha1').update(`${JSON.stringify(r1[0])}`).digest('hex')
 
 
-            console.log("r1 from SavedTable::",r1[0])
-            console.log("newJSON from MainUTMETable",newJSON)
-            console.log('this is phone::', (phone))
+            // console.log("r1 from SavedTable::",r1[0])
+            // console.log("newJSON from MainUTMETable",newJSON)
+            // console.log('this is phone::', (phone))
             // console.log('this is phone to string::', (phone).toString())
 
             if (h1 !== h2) {
@@ -2243,8 +2243,8 @@ async function onStudentsRecordSendSave(req, res) {
                 projectManagers = []
                 itemNo = 0
                 // await waitForServerProcess(delays)
-                const answerToken = {}
-                // const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)
+                // const answerToken = {}
+                const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)
                 // if successful
                 if (answerToken.status) 
                 {
@@ -2275,8 +2275,8 @@ async function onStudentsRecordSendSave(req, res) {
                 batchCondition[0] = currentBatch
                 // await waitForServerProcess(delays)
                 const copyprojectManagers = projectManagers
-                const answerToken = {}
-                // const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)// const waitanswer = await waitForServerProcess(delays)
+                // const answerToken = {}
+                const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)// const waitanswer = await waitForServerProcess(delays)
                 console.log('total number sent in this batch::', copyprojectManagers.length)
                 if (answerToken.status) 
                 {
@@ -3074,7 +3074,7 @@ async function getAllRegNoMain(start, stop,
     let queryTemp = '';
     if (start || stop || dateLast || course) {
         queryTemp = `SELECT reg_num, phone FROM ${mainTableName[type]}
-  WHERE id >= ${start ? start : 0} AND reg_num = '202331347594GA'`
+  WHERE id >= ${start ? start : 0} `
         if (stop) {
             queryTemp +=  ` AND id <= ${stop}`;
         }
@@ -3090,7 +3090,7 @@ async function getAllRegNoMain(start, stop,
 
     }
     else{
-        queryTemp = `SELECT reg_num FROM ${mainTableName[type]} WHERE reg_num = '202331347594GA'
+        queryTemp = `SELECT reg_num FROM ${mainTableName[type]}
   `
     }
     const answer = await doQuery(queryTemp)
