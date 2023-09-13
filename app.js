@@ -510,7 +510,7 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample, phone) 
         console.log('r1::', r1)
         console.log('r1[0]::', r1[0])
         console.log('this is phone::', (phone))
-        console.log('this is phone to string::', (phone).toString())
+        console.log('this is phone to string::', isNullOrUndefined(phone))
 
 
         if (r1.length > 0) {
@@ -519,7 +519,7 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample, phone) 
                 {reg_num: toSendSample.reg_num , department: toSendSample.department,
 
                     // school: recommendObj.Info ? recommendObj.Info : 'UNIZIK',
-                         school: !isNullOrUndefined(phone) && phone.toString() !== '' ? (
+                         school: !isNullOrUndefined(phone) && phone !== '' ? (
                                      (phone).toString() ==="1" ? "UMUNZE" :
                                          ((phone.toString()  ==="2" ? "AUCHI":(phone.toString()  ==="3" ? "POPE JOHN" : "ESCET"))) ): 'UNIZIK' ,
                     student_type: toSendSample.student_type,
@@ -546,7 +546,7 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample, phone) 
             console.log("r1 from SavedTable::",r1[0])
             console.log("newJSON from MainUTMETable",newJSON)
             console.log('this is phone::', (phone))
-            console.log('this is phone to string::', (phone).toString())
+            // console.log('this is phone to string::', (phone).toString())
 
             if (h1 !== h2) {
                 console.log("not equal")
@@ -3165,7 +3165,7 @@ async function saveDetailsOfPush(type,toSendSample, phone) {
 }
 
 function isNullOrUndefined (value) {
-    return (value === null)
+    return (value === null || value === undefined)
 
     // `value == null` is the same as `value === undefined || value === null`
 }
