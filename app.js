@@ -508,7 +508,9 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample, phone) 
         //           (atype2 ==="2" ? "AUCHI":(atype2 ==="3" ? "POPE JOHN" : "ESCET"))
         //           type2 = toSend[0]['phone'] ? toSend[0]['phone'] : 0
         console.log('r1::', r1)
-
+        console.log('r1[0]::', r1[0])
+        console.log('this is phone::', (phone))
+        console.log('this is phone to string::', (phone).toString())
 
 
         if (r1.length > 0) {
@@ -3163,7 +3165,7 @@ async function saveDetailsOfPush(type,toSendSample, phone) {
 }
 
 function isNullOrUndefined (value) {
-    return value === null
+    return (value === null)
 
     // `value == null` is the same as `value === undefined || value === null`
 }
