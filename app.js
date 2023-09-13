@@ -884,7 +884,7 @@ async function deleteTable(tableName) {
 
 async function doQuery(queryToDo) {
     let pro = new Promise((resolve,reject) => {
-        let query = queryToDo;
+        const query = queryToDo;
         connection.query(query, function (err, result) {
             if (err)
             {
@@ -1024,15 +1024,15 @@ async function readExcelFile(type,arrayBuffer) {
     var arr = new Array();
     // var i = 0;
     // if (type == "PRE") {}
-    for(var i = 0; i != data.length; ++i) {
+    for(let i = 0; i !== data.length; ++i) {
         arr[i] = String.fromCharCode(data[i]);
 
     }
-    var bstr = arr.join("");
-    var workbook = reader.read(bstr, {type:"binary"});
-    var first_sheet_name = workbook.SheetNames[0];
-    var worksheet = workbook.Sheets[first_sheet_name];
-    var tempUpload = reader.utils.sheet_to_json(worksheet,{raw:true});
+    let bstr = arr.join("");
+    let workbook = reader.read(bstr, {type:"binary"});
+    let first_sheet_name = workbook.SheetNames[0];
+    let worksheet = workbook.Sheets[first_sheet_name];
+    let tempUpload = reader.utils.sheet_to_json(worksheet,{raw:true});
 
 
 
@@ -1513,7 +1513,7 @@ async function onFileupload(req, res) {
     const schoolType = req.body.type
     
     console.log("in uploadutme umunze-1, auchi-2..", schoolType)
-    if (uploadStatus[type] != 'ready' && uploadStatus[type] != 'success') {
+    if (uploadStatus[type] !== 'ready' && uploadStatus[type] !== 'success') {
         res.status(204).json({
             message: "An upload operation is still ongoing. Try again later",
         });
@@ -3085,7 +3085,7 @@ async function getAllRegNoMain(start, stop,
 
     }
     else{
-        queryTemp = `SELECT reg_num FROM ${mainTableName[type]}
+        queryTemp = `SELECT reg_num FROM ${mainTableName[type]} WHERE reg_num = '202331347594GA'
   `
     }
     const answer = await doQuery(queryTemp)
