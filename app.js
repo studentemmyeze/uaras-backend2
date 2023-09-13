@@ -285,7 +285,7 @@ function waitforme(ms)  {
 
 async function updateStudentRecordSave(type,tableName,toSendSample) {
     queryTemp = ''
-    if (type == "SAVEUTMESTATUS") {
+    if (type === "SAVEUTMESTATUS") {
         queryTemp = `UPDATE ${tableName}
     SET department = '${await checkForApostro(toSendSample.department)}',
 
@@ -322,7 +322,7 @@ async function updateStudentRecord(type,tableName,i, schoolType='') {
     // }
 
 
-    if (type == "UTME" && schoolType !== '') {
+    if (type === "UTME" && schoolType !== '') {
         queryTemp = `UPDATE ${tableName}
     SET fullname = '${await checkForApostro(tempUTME[type][i].RG_CANDNAME)}',
     sex = '${tempUTME[type][i].RG_SEX}',
@@ -338,7 +338,7 @@ async function updateStudentRecord(type,tableName,i, schoolType='') {
     }
 
 
-    else if (type == "UTME") {
+    else if (type === "UTME") {
         queryTemp = `UPDATE ${tableName}
     SET fullname = '${await checkForApostro(tempUTME[type][i].RG_CANDNAME)}',
     sex = '${tempUTME[type][i].RG_SEX}',
@@ -357,7 +357,7 @@ async function updateStudentRecord(type,tableName,i, schoolType='') {
 
 
 
-    else if (type == "DE") {
+    else if (type === "DE") {
         queryTemp = `UPDATE ${tableName}
     SET fullname = '${await checkForApostro(tempUTME[type][i].RG_CANDNAME)}',
     sex = '${tempUTME[type][i].RG_SEX}',
@@ -370,7 +370,7 @@ async function updateStudentRecord(type,tableName,i, schoolType='') {
 
     }
 
-    else if (type == "PRE") {
+    else if (type === "PRE") {
         queryTemp = `UPDATE ${tableName}
     SET fullname = '${await checkForApostro(tempUTME[type][i].RG_CANDNAME)}',
     jamb_score = ${tempUTME[type][i].RG_AGGREGATE},
@@ -384,7 +384,7 @@ async function updateStudentRecord(type,tableName,i, schoolType='') {
     average = ${tempUTME[type][i].AVG}
     WHERE reg_num = '${tempUTME[type][i].RG_NUM}'`;
     }
-    else if (type == "JUPEB") {
+    else if (type === "JUPEB") {
         queryTemp = `UPDATE ${tableName}
     SET
     jupeb_no = '${tempUTME[type][i].JUP_NUM}',
@@ -400,7 +400,7 @@ async function updateStudentRecord(type,tableName,i, schoolType='') {
 
 
 
-    else if (type == "SUP") {
+    else if (type === "SUP") {
 
         queryTemp = `UPDATE ${tableName}
     SET
@@ -410,7 +410,7 @@ async function updateStudentRecord(type,tableName,i, schoolType='') {
     WHERE reg_num = '${tempUTME[type][i].RG_NUM}'`;
     }
 
-    else if (type == "POSTUTME") {
+    else if (type === "POSTUTME") {
         queryTemp = `UPDATE ${tableName}
     SET
     utme_score = ${tempUTME[type][i].RG_AGGREGATE},
@@ -424,7 +424,7 @@ async function updateStudentRecord(type,tableName,i, schoolType='') {
 
 async function updateStudentRecord_Registrations(type,tableName, record) {
     var queryTemp = ""
-    if (type == "UTME") {
+    if (type === "UTME") {
         queryTemp = `UPDATE ${tableName}
     SET
     phone = '${await checkForApostro(record.phone)}',
@@ -433,7 +433,7 @@ async function updateStudentRecord_Registrations(type,tableName, record) {
     WHERE reg_num = '${record.reg_num}'`;
 
     }
-    else if (type == "DE") {
+    else if (type === "DE") {
         queryTemp = `UPDATE ${tableName}
     SET fullname = '${await checkForApostro(tempUTME[type][i].RG_CANDNAME)}',
     sex = '${tempUTME[type][i].RG_SEX}',
@@ -446,7 +446,7 @@ async function updateStudentRecord_Registrations(type,tableName, record) {
 
     }
 
-    else if (type == "PRE") {
+    else if (type === "PRE") {
         queryTemp = `UPDATE ${tableName}
     SET fullname = '${await checkForApostro(tempUTME[type][i].RG_CANDNAME)}',
     jamb_score = ${tempUTME[type][i].RG_AGGREGATE},
@@ -460,7 +460,7 @@ async function updateStudentRecord_Registrations(type,tableName, record) {
     average = ${tempUTME[type][i].AVG}
     WHERE reg_num = '${tempUTME[type][i].RG_NUM}'`;
     }
-    else if (type == "JUPEB") {
+    else if (type === "JUPEB") {
         queryTemp = `UPDATE ${tableName}
     SET
     jupeb_no = '${tempUTME[type][i].JUP_NUM}',
@@ -476,7 +476,7 @@ async function updateStudentRecord_Registrations(type,tableName, record) {
 
 
 
-    else if (type == "SUP") {
+    else if (type ==="SUP") {
 
         queryTemp = `UPDATE ${tableName}
     SET
@@ -486,7 +486,7 @@ async function updateStudentRecord_Registrations(type,tableName, record) {
     WHERE reg_num = '${tempUTME[type][i].RG_NUM}'`;
     }
 
-    else if (type == "POSTUTME") {
+    else if (type === "POSTUTME") {
         queryTemp = `UPDATE ${tableName}
     SET
     utme_score = ${tempUTME[type][i].RG_AGGREGATE},
@@ -517,7 +517,7 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample, phone) 
                 {reg_num: toSendSample.reg_num , department: toSendSample.department,
 
                     // school: recommendObj.Info ? recommendObj.Info : 'UNIZIK',
-                         school: phone && phone !== '' ? (
+                         school: !isNullOrUndefined(phone) && phone.toString() !== '' ? (
                                      (phone).toString() ==="1" ? "UMUNZE" :
                                          ((phone.toString()  ==="2" ? "AUCHI":(phone.toString()  ==="3" ? "POPE JOHN" : "ESCET"))) ): 'UNIZIK' ,
                     student_type: toSendSample.student_type,
@@ -635,7 +635,7 @@ async function createTable(type, tableName) {
 
 
     var sql = ""
-    if (type == "UTME") {
+    if (type==="UTME") {
         sql = `
     CREATE TABLE ${tableName} (
       id INT NOT NULL AUTO_INCREMENT COMMENT 'unique ID for each candidate',
@@ -664,7 +664,7 @@ async function createTable(type, tableName) {
   ) ENGINE = InnoDB CHARSET = utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT = 'This table is for UTME Candidates'`
     }
 
-    else if (type == "DE") {
+    else if (type==="DE") {
 
         sql = `CREATE TABLE ${tableName} (
         id INT NOT NULL AUTO_INCREMENT COMMENT 'unique ID for each candidate',
@@ -684,7 +684,7 @@ async function createTable(type, tableName) {
     ) ENGINE = InnoDB CHARSET = utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT = 'This table is for DE Candidates';`
     }
 
-    else if (type == "PRE") {
+    else if (type==="PRE") {
         sql = `CREATE TABLE ${tableName} (
         id INT NOT NULL AUTO_INCREMENT COMMENT 'unique ID for each candidate',
         reg_num VARCHAR(30) NOT NULL COMMENT 'unique reg_num for each candidate',
@@ -708,7 +708,7 @@ async function createTable(type, tableName) {
     ) ENGINE = InnoDB CHARSET = utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT = 'This table is for prescience Candidates';`
     }
 
-    else if (type == "JUPEB") {
+    else if (type==="JUPEB") {
 
         sql = `
       CREATE TABLE ${tableName} (
@@ -731,7 +731,7 @@ async function createTable(type, tableName) {
 
     }
 
-    else if (type == "SUP") {
+    else if (type==="SUP") {
         sql = `CREATE TABLE ${tableName} (
         id INT NOT NULL AUTO_INCREMENT COMMENT 'unique ID for each candidate',
         reg_num VARCHAR(30) NOT NULL COMMENT 'the unique registration number for each candidate',
@@ -745,7 +745,7 @@ async function createTable(type, tableName) {
 
     }
 
-    else if (type == "POSTUTME") {
+    else if (type === "POSTUTME") {
         sql = `CREATE TABLE  ${tableName} (
         id INT NOT NULL AUTO_INCREMENT COMMENT 'unique ID for each candidate',
         reg_num VARCHAR(30) NOT NULL COMMENT 'the unique registration number for each candidate',
@@ -761,7 +761,7 @@ async function createTable(type, tableName) {
 
     }
 
-    else if (type == "UTMEREG") {
+    else if (type === "UTMEREG") {
         sql = `
     CREATE TABLE ${tableName} (
       id INT NOT NULL AUTO_INCREMENT COMMENT 'unique ID for each candidate',
@@ -791,7 +791,7 @@ async function createTable(type, tableName) {
 
     }
 
-    else if (type == "PASSMK") {
+    else if (type === "PASSMK") {
         sql = `
     CREATE TABLE ${tableName} (
 
@@ -807,7 +807,7 @@ async function createTable(type, tableName) {
 
     }
 
-    if (type == "SAVEUTMESTATUS") {
+    if (type === "SAVEUTMESTATUS") {
         sql = `
     CREATE TABLE ${tableName} (
       id INT NOT NULL AUTO_INCREMENT COMMENT 'unique ID for each candidate',
@@ -905,7 +905,7 @@ async function recordsFromATableGrab(type, regNo, tableName, condition=false) {
     // console.log("@RECORDS FROM A TABLE GRAB", type)
 
     var sql = ""
-    if (type == "UTME") {
+    if (type === "UTME") {
         if (condition) {
             sql = `SELECT
   reg_num, fullname, sex, state, utme_aggregate, department, lga, subject_1, subject_1_score, subject_2,
@@ -922,19 +922,19 @@ async function recordsFromATableGrab(type, regNo, tableName, condition=false) {
         }
     }
 
-    else if (type == "SAVEUTMESTATUS") {
+    else if (type === "SAVEUTMESTATUS") {
         sql = `SELECT
   reg_num, department, school, student_type, recommendation, qualified
   FROM ${tableName} WHERE reg_num = '${regNo}'
   `
     }
-    else if (type == "DE") {
+    else if (type === "DE") {
         sql = `SELECT reg_num, fullname, sex, state, department, lga, phone
   FROM ${tableName} WHERE reg_num = '${regNo}'`;
 
     }
 
-    else if (type == "PRE") {
+    else if (type === "PRE") {
         sql = `SELECT
   reg_num, fullname, jamb_score,prescience_no, subjects,best_of_four,sex, state,department_admitted, average,
   phone,email,bio_data,added, edited
@@ -942,21 +942,21 @@ async function recordsFromATableGrab(type, regNo, tableName, condition=false) {
   FROM ${tableName} WHERE reg_num = '${regNo}'
   `
     }
-    else if (type == "JUPEB") {
+    else if (type === "JUPEB") {
         sql = `SELECT
   reg_num,jupeb_no, fullname, subjects,total_score,first_choice,second_choice, remarks,bio_data,added, edited
    FROM ${tableName} WHERE reg_num = '${regNo}'
   `
 
     }
-    else if (type == "SUP") {
+    else if (type === "SUP") {
         sql = `SELECT id,
   reg_num,preferred_course,source,added,edited
   FROM ${tableName} WHERE reg_num = '${regNo}'
   `
 
     }
-    else if (type == "POSTUTME") {
+    else if (type === "POSTUTME") {
         sql = `SELECT
   reg_num,utme_score,putme_score,calculated_average,added, edited
   FROM ${tableName} WHERE reg_num = '${regNo}'
@@ -974,7 +974,7 @@ async function grabDepartmentCutoff(type, department, tableName) {
     console.log("@RECORDS FROM A DEPARTMENT GRAB", type)
 
     var sql = ""
-    if (type == "UTME") {
+    if (type === "UTME") {
         sql = `SELECT
   id, department, utme_cutoff, putme_cutoff
   FROM ${tableName} WHERE department = '${department}'
@@ -989,7 +989,7 @@ async function grabDepartmentsCutoff(type, tableName) {
     // console.log("@RECORDS FROM ALL DEPARTMENTS GRAB", type)
 
     var sql = ""
-    if (type == "UTME") {
+    if (type === "UTME") {
         sql = `SELECT
   id, department, utme_cutoff, putme_cutoff
   FROM ${tableName}
@@ -1150,9 +1150,9 @@ async function addRecord2(type,tableName, toSendSample, phone='') {
  '${await checkForApostro(toSendSample.lga)}', '${toSendSample.subject_1}', ${toSendSample.subject_1_score ? toSendSample.subject_1_score : ''},
  '${toSendSample.subject_2}', ${toSendSample.subject_2_score ? toSendSample.subject_2_score : ''}, '${toSendSample.subject_3}',
  ${toSendSample.subject_3_score ? toSendSample.subject_3_score : ''}, ${toSendSample.english_score ? toSendSample.english_score : ''},
- '${(phone && phone !== '') ? (
-        phone ==="1" ? "UMUNZE" :
-            (phone ==="2" ? "AUCHI":(phone ==="3" ? "POPE JOHN" : "ESCET"))) : 'UNIZIK'}',
+ '${(!isNullOrUndefined(phone) && phone.toString() !== '') ? (
+        phone.toString() ==="1" ? "UMUNZE" :
+            (phone.toString() ==="2" ? "AUCHI":(phone.toString() ==="3" ? "POPE JOHN" : "ESCET"))) : 'UNIZIK'}',
 
  ${toSendSample.student_type}, '${toSendSample.recommendation}', ${toSendSample.qualified}
 )`
@@ -1266,7 +1266,7 @@ async function checkForApostro(aString) {
         var answerArray = aString.split(`'`)
         if (answerArray.length > 1){
             for (var i = 0; i < answerArray.length; i++) {
-                if (i % 2 == 0) { answer = answer + answerArray[i] + `''`;}
+                if (i % 2 === 0) { answer = answer + answerArray[i] + `''`;}
                 else { answer = answer + answerArray[i]}
             }
             // console.log("CHECK FOR APOST::", answer)
@@ -1636,7 +1636,7 @@ async function onFileupload(req, res) {
 
 }
 async function onFileupload2(req, res) {
-    type ='UTME'
+    let type ='UTME'
     resetVariables(type)
     // for each record in the temp table
     // hash that record h1
@@ -1777,7 +1777,7 @@ async function fetchPrescienceMetaData(aPrescienceRecord) {
 }
 app.route('/api/uploadpresciencecandidate').post(onFileuploadPRE)
 async function onFileuploadPRE(req, res) {
-    type ='PRE'
+    let type ='PRE'
     resetVariables(type)
     // for each record in the temp table
     // hash that record h1
@@ -1825,7 +1825,7 @@ async function onFileuploadPRE(req, res) {
 
 app.route('/api/uploadjupebcandidate').post(onFileuploadJUPEB)
 async function onFileuploadJUPEB(req, res) {
-    type ='JUPEB'
+    let type ='JUPEB'
     resetVariables(type)
     // for each record in the temp table
     // hash that record h1
@@ -1872,7 +1872,7 @@ async function onFileuploadJUPEB(req, res) {
 
 app.route('/api/uploadsupcandidate').post(onFileuploadSUP)
 async function onFileuploadSUP(req, res) {
-    type ='SUP'
+    let type ='SUP'
     resetVariables(type)
     // for each record in the temp table
     // hash that record h1
@@ -1920,7 +1920,7 @@ async function onFileuploadSUP(req, res) {
 
 app.route('/api/uploadpostutme').post(onFileuploadPOSTUTME)
 async function onFileuploadPOSTUTME(req, res) {
-    type ='POSTUTME'
+    let type ='POSTUTME'
     resetVariables(type)
     // for each record in the temp table
     // hash that record h1
@@ -2238,8 +2238,8 @@ async function onStudentsRecordSendSave(req, res) {
                 projectManagers = []
                 itemNo = 0
                 // await waitForServerProcess(delays)
-
-                const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)
+                const answerToken = {}
+                // const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)
                 // if successful
                 if (answerToken.status) 
                 {
@@ -2270,7 +2270,8 @@ async function onStudentsRecordSendSave(req, res) {
                 batchCondition[0] = currentBatch
                 // await waitForServerProcess(delays)
                 const copyprojectManagers = projectManagers
-                const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)// const waitanswer = await waitForServerProcess(delays)
+                const answerToken = {}
+                // const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)// const waitanswer = await waitForServerProcess(delays)
                 console.log('total number sent in this batch::', copyprojectManagers.length)
                 if (answerToken.status) 
                 {
@@ -2373,7 +2374,7 @@ async function onStudentsRecordSend(req, res) {
         const aRegNo = regNoList[i]['reg_num']
         batchCondition[1] = i
         const response = await requestWithRetry (i,aRegNo,type, projectManagers)
-        if (i % batchNo == 0 && i != 0) {
+        if (i % batchNo === 0 && i != 0) {
             currentBatch += 1
             batchCondition[0] = currentBatch
 
@@ -2419,7 +2420,7 @@ async function onStudentsRecordSend(req, res) {
 
 app.route('/api/push-to-chuka-de').get(onStudentsRecordSendDE)
 async function onStudentsRecordSendDE(req, res) {
-    type = "DE"
+    let type = "DE"
     let batchNo = 100;
     currentBatch = 0;
     var projectManagers = []
@@ -2531,7 +2532,7 @@ async function onStudentSyncCheck(req, res) {
         const aRegNo = regNoList[i]
         const response = await requestWithRetry_sync_issues (i,aRegNo,type, projectManagers)
 
-        if ((i % batchNo == 0 && i != 0) || (i+ 1 === total)) {
+        if ((i % batchNo === 0 && i != 0) || (i+ 1 === total)) {
             var result_total = projectManagers.length
 
             // prepare the json object
@@ -2895,7 +2896,7 @@ async function readJSONChuka(batch = 0) {
     // }
     try {
         var data = []
-        if (batch == -1) {data = JSON.parse(fs.readFileSync('jmb.json'));}
+        if (batch === -1) {data = JSON.parse(fs.readFileSync('jmb.json'));}
         else {
             var filename  = `jmb${batch}.json`;
             data = JSON.parse(fs.readFileSync(filename));
@@ -2944,7 +2945,7 @@ async function writeJSONConfirm(jsonList, filename) {
 }
 
 async function onStudentsRecordBatch(req, res) {
-    type = "UTME"
+    let type = "UTME"
     let batchNo = 100;
     currentBatch = 0;
     var projectManagers = []
@@ -3158,6 +3159,12 @@ async function saveDetailsOfPush(type,toSendSample, phone) {
     // closeConnection()
 }
 
+function isNullOrUndefined (value) {
+    return value === null
+
+    // `value == null` is the same as `value === undefined || value === null`
+}
+
 async function getStudentRegistrationInfo(ii,regNo, type, projectM) {
     // else {
     let toSend2 = {}
@@ -3194,10 +3201,11 @@ async function getStudentRegistrationInfo(ii,regNo, type, projectM) {
 
         return toSend2
     }
-    else {
+    else if (type === "UTME") {
         try {
 
-            type2 = toSend[0]['phone'] ? toSend[0]['phone'] : 0
+
+            type2 = isNullOrUndefined(toSend[0]['phone']) ? 0 : parseInt(toSend[0]['phone']);
             const ajson =
                 {
                     score: toSend[0]['utme_aggregate'],
@@ -3205,16 +3213,16 @@ async function getStudentRegistrationInfo(ii,regNo, type, projectM) {
                     sub1: toSend[0]['subject_1'], sub2: toSend[0]['subject_2'], sub3: toSend[0]['subject_3']
                 };
 
-            var affiliateUpper = ['Federal college of education (technical) Umunze (FCETU)',
+            let affiliateUpper = ['Federal college of education (technical) Umunze (FCETU)',
                 'Enugu State College of Education (technical) (ESCET)',
                 'Pope John Paul Seminary, Okpuno',
                 'Auchi Polytechnic, Auchi, Delta State'
             ]
-            var affiliateLower = ['Paul University, Awka',
+            let affiliateLower = ['Paul University, Awka',
                 'Peter University, Achina-Onneh',
                 'Legacy University, Okija']
-            var recommend = {}
-            var qualified = 1
+            let recommend = {}
+            let qualified = 1
             const url = pythonUrl + `/api/suggest-departments/${encodeURIComponent(JSON.stringify(ajson))}`;
 
             // handles affiliate recommendations
@@ -3678,7 +3686,7 @@ async function calculateMerit() {
 // async function getCountOf
 
 async function processAdmissionsList4PUTMEdata() {
-    type = "UTMEREG"
+    let type = "UTMEREG"
     // go through each item on the UTME table..
     // check if the regNo exists on the reg table- if it does check to see if the date on the UTME table is later
     //  if it is replace the details with the up to date one
