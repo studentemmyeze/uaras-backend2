@@ -539,8 +539,10 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample, phone) 
 
             const h1 = crypto.createHash('sha1').update(`${JSON.stringify(newJSON)}`).digest('hex')
             const h2 = crypto.createHash('sha1').update(`${JSON.stringify(r1[0])}`).digest('hex')
-            // console.log("r1 from SavedTable::",r1[0])
-            // console.log("newJSON from MainUTMETable",newJSON)
+
+            console.log('this is phone::', (phone).toString())
+            console.log("r1 from SavedTable::",r1[0])
+            console.log("newJSON from MainUTMETable",newJSON)
             
 
             if (h1 !== h2) {
