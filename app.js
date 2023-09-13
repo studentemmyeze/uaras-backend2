@@ -507,7 +507,7 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample, phone) 
         // atype2 ==="1" ? "UMUNZE" :
         //           (atype2 ==="2" ? "AUCHI":(atype2 ==="3" ? "POPE JOHN" : "ESCET"))
         //           type2 = toSend[0]['phone'] ? toSend[0]['phone'] : 0
-
+        console.log('r1::', r1)
 
 
 
