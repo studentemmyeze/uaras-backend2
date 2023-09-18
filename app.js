@@ -510,8 +510,8 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample, phone) 
         //           type2 = toSend[0]['phone'] ? toSend[0]['phone'] : 0
         // console.log('r1::', r1)
         // console.log('r1[0]::', r1[0])
-        console.log('this is phone::', (phone))
-        console.log('this is phone function::', isNullOrUndefined(phone))
+        // console.log('this is phone::', (phone))
+        // console.log('this is phone function::', isNullOrUndefined(phone))
 
 
         if (r1.length > 0) {
@@ -519,7 +519,7 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample, phone) 
 
             let School = "";
             try {
-                if (!isNullOrUndefined(phone) && phone !== '' && phone !== ' '){
+                if (!isNullOrUndefined(phone) && phone !== '' && phone !== ' ' && phone !== 0 && phone !== '0'){
                     if (phone.toString() ==="1") {School = "UMUNZE" }
                     if (phone.toString() ==="2") {School = "AUCHI" }
                     if (phone.toString() ==="3") {School = "POPE JOHN" }
@@ -556,8 +556,8 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample, phone) 
             const h2 = crypto.createHash('sha1').update(`${JSON.stringify(r1[0])}`).digest('hex')
 
 
-            console.log("r1 from SavedTable::",r1[0])
-            console.log("newJSON from to save",newJSON)
+            // console.log("r1 from SavedTable::",r1[0])
+            // console.log("newJSON from to save",newJSON)
             // console.log('this is phone::', (phone))
             // console.log('this is phone to string::', (phone).toString())
 
@@ -1158,7 +1158,7 @@ async function addRecord2(type,tableName, toSendSample, phone='') {
     // console.log("to send reg no::", toSendSample.reg_num)
     let School = "";
     try {
-        if (!isNullOrUndefined(phone) && phone !== '' &&  phone !== ' '){
+        if (!isNullOrUndefined(phone) && phone !== '' &&  phone !== ' ' && phone !== 0 && phone !== '0'){
             if (phone.toString() ==="1") {School = "UMUNZE" }
             if (phone.toString() ==="2") {School = "AUCHI" }
             if (phone.toString() ==="3") {School = "POPE JOHN" }
@@ -2268,8 +2268,8 @@ async function onStudentsRecordSendSave(req, res) {
                 projectManagers = []
                 itemNo = 0
                 // await waitForServerProcess(delays)
-                const answerToken = {}
-                // const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)
+                // const answerToken = {}
+                const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)
                 // if successful
                 if (answerToken.status) 
                 {
@@ -2300,8 +2300,8 @@ async function onStudentsRecordSendSave(req, res) {
                 batchCondition[0] = currentBatch
                 // await waitForServerProcess(delays)
                 const copyprojectManagers = projectManagers
-                const answerToken = {}
-                // const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)// const waitanswer = await waitForServerProcess(delays)
+                // const answerToken = {}
+                const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)// const waitanswer = await waitForServerProcess(delays)
                 console.log('total number sent in this batch::', copyprojectManagers.length)
                 if (answerToken.status) 
                 {
