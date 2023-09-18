@@ -272,8 +272,9 @@ async function closeConnection() {
                 return console.log('error:' + err.message);
             }
             console.log('Close the database connection.');
+            isConnectedToDB = false;
         });
-        isConnectedToDB = false;
+
     }
     
 }
@@ -544,12 +545,12 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample, phone) 
 
 
             // console.log("r1 from SavedTable::",r1[0])
-            // console.log("newJSON from MainUTMETable",newJSON)
+            console.log("newJSON from saved table",newJSON)
             // console.log('this is phone::', (phone))
             // console.log('this is phone to string::', (phone).toString())
 
             if (h1 !== h2) {
-                console.log("not equal")
+                console.log("not equal- will save newJSON")
                 await updateStudentRecordSave(type,tableName,newJSON)
             }
             // reg_num, department, school, student_type, recommendation, qualified
@@ -557,6 +558,7 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample, phone) 
         }
         else {
             try {
+                console.log('What we want to save::', toSendSample)
                 await addRecord2(type,tableName,toSendSample, phone)
                 updatedData[type].push(toSendSample.reg_num)
             } catch (error) {
@@ -1143,13 +1145,17 @@ async function addRecord2(type,tableName, toSendSample, phone='') {
     // console.log("to send sample::", toSendSample)
     // console.log("to send reg no::", toSendSample.reg_num)
     let School = "";
-    if (!isNullOrUndefined(phone)){
-        if (phone.toString() ==="1") {School = "UMUNZE" }
-        if (phone.toString() ==="2") {School = "AUCHI" }
-        if (phone.toString() ==="3") {School = "POPE JOHN" }
-        if (phone.toString() ==="4") {School = "ESCET" }
+    try {
+        if (!isNullOrUndefined(phone) && phone !== ''){
+            if (phone.toString() ==="1") {School = "UMUNZE" }
+            if (phone.toString() ==="2") {School = "AUCHI" }
+            if (phone.toString() ==="3") {School = "POPE JOHN" }
+            if (phone.toString() ==="4") {School = "ESCET" }
+        }
+        else {School = 'UNIZIK'}
     }
-    else {School = 'UNIZIK'}
+    catch {School = 'UNIZIK'}
+    console.log('SCHOOL TO BE SAVED::', School)
     queryTemp = `INSERT INTO ${tableName} (
     reg_num, lastname, firstname, middlename, sex, state, utme_aggregate, department, faculty,
     lga, subject_1, subject_1_score, subject_2,
@@ -2234,7 +2240,7 @@ async function onStudentsRecordSendSave(req, res) {
         pushStatusMessage[type] = pushStatusMessage[type] + '\nstarting retrieve, save and push to Chuka'
         for (let i = 0; i < total ; i++) {
 
-            const aRegNo = regNoList[i]['reg_num']
+            const aRegNo = total[i]
             batchCondition[1] = i
             const response = await requestWithRetry (i,aRegNo,type, projectManagers)
             // console.log("this is projectManagers", projectManagers)
