@@ -2190,6 +2190,7 @@ async function onStudentsRecordSendSave(req, res) {
         const bSize = req.query.batchsize
         const delayspec = req.query.delays
         const course = req.query.course
+        // let totalData = []
         if (bSize) {
             batchNo = bSize
         }
@@ -2214,7 +2215,7 @@ async function onStudentsRecordSendSave(req, res) {
         var total = 0
         try {
             total = regNoList.length;
-            totalData = []
+            let totalData = []
             regNoList.forEach(e => {
                 totalData.push(e['reg_num'])
 
@@ -2240,7 +2241,7 @@ async function onStudentsRecordSendSave(req, res) {
         pushStatusMessage[type] = pushStatusMessage[type] + '\nstarting retrieve, save and push to Chuka'
         for (let i = 0; i < total ; i++) {
 
-            const aRegNo = total[i]
+            const aRegNo = regNoList[i]['reg_num']
             batchCondition[1] = i
             const response = await requestWithRetry (i,aRegNo,type, projectManagers)
             // console.log("this is projectManagers", projectManagers)
