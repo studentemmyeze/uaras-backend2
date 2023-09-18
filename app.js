@@ -2255,8 +2255,8 @@ async function onStudentsRecordSendSave(req, res) {
                 projectManagers = []
                 itemNo = 0
                 // await waitForServerProcess(delays)
-                // const answerToken = {}
-                const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)
+                const answerToken = {}
+                // const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)
                 // if successful
                 if (answerToken.status) 
                 {
@@ -2287,8 +2287,8 @@ async function onStudentsRecordSendSave(req, res) {
                 batchCondition[0] = currentBatch
                 // await waitForServerProcess(delays)
                 const copyprojectManagers = projectManagers
-                // const answerToken = {}
-                const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)// const waitanswer = await waitForServerProcess(delays)
+                const answerToken = {}
+                // const answerToken = await postChukaBatch(copyprojectManagers, issuesBatches)// const waitanswer = await waitForServerProcess(delays)
                 console.log('total number sent in this batch::', copyprojectManagers.length)
                 if (answerToken.status) 
                 {
