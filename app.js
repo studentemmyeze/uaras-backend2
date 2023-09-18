@@ -519,7 +519,7 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample, phone) 
                 {reg_num: toSendSample.reg_num , department: toSendSample.department,
 
                     // school: recommendObj.Info ? recommendObj.Info : 'UNIZIK',
-                         school: !isNullOrUndefined(phone) && phone !== '' ? (
+                         school: !isNullOrUndefined(phone)  ? (
                                      (phone).toString() ==="1" ? "UMUNZE" :
                                          ((phone.toString()  ==="2" ? "AUCHI":(phone.toString()  ==="3" ? "POPE JOHN" : "ESCET"))) ): 'UNIZIK' ,
                     student_type: toSendSample.student_type,
@@ -586,7 +586,7 @@ async function matchUTMECandidateHash(type,tableName, tempTableName, schoolType=
             const h2 = crypto.createHash('sha1').update(`${JSON.stringify(r2[0])}`).digest('hex')
             if (h1 !== h2) {
                 try {
-                    updateStudentRecord(type,tableName, i, schoolType)
+                    await updateStudentRecord(type,tableName, i, schoolType)
                     updatedData[type].push(tempUTME[type][i])
                 } catch (error) {
                     dataNotProcessed[type].push(tempUTME[type][i])
@@ -1142,6 +1142,14 @@ app.use((req, res, next) => {
 async function addRecord2(type,tableName, toSendSample, phone='') {
     // console.log("to send sample::", toSendSample)
     // console.log("to send reg no::", toSendSample.reg_num)
+    let School = "";
+    if (!isNullOrUndefined(phone)){
+        if (phone.toString() ==="1") {School = "UMUNZE" }
+        if (phone.toString() ==="2") {School = "AUCHI" }
+        if (phone.toString() ==="3") {School = "POPE JOHN" }
+        if (phone.toString() ==="4") {School = "ESCET" }
+    }
+    else {School = 'UNIZIK'}
     queryTemp = `INSERT INTO ${tableName} (
     reg_num, lastname, firstname, middlename, sex, state, utme_aggregate, department, faculty,
     lga, subject_1, subject_1_score, subject_2,
@@ -1155,9 +1163,7 @@ async function addRecord2(type,tableName, toSendSample, phone='') {
  '${await checkForApostro(toSendSample.lga)}', '${toSendSample.subject_1}', ${toSendSample.subject_1_score ? toSendSample.subject_1_score : ''},
  '${toSendSample.subject_2}', ${toSendSample.subject_2_score ? toSendSample.subject_2_score : ''}, '${toSendSample.subject_3}',
  ${toSendSample.subject_3_score ? toSendSample.subject_3_score : ''}, ${toSendSample.english_score ? toSendSample.english_score : ''},
- '${(!isNullOrUndefined(phone) && phone.toString() !== '') ? (
-        phone.toString() ==="1" ? "UMUNZE" :
-            (phone.toString() ==="2" ? "AUCHI":(phone.toString() ==="3" ? "POPE JOHN" : "ESCET"))) : 'UNIZIK'}',
+ '${School}',
 
  ${toSendSample.student_type}, '${toSendSample.recommendation}', ${toSendSample.qualified}
 )`
@@ -2379,7 +2385,7 @@ async function onStudentsRecordSend(req, res) {
         const aRegNo = regNoList[i]['reg_num']
         batchCondition[1] = i
         const response = await requestWithRetry (i,aRegNo,type, projectManagers)
-        if (i % batchNo === 0 && i != 0) {
+        if (i % batchNo === 0 && i !== 0) {
             currentBatch += 1
             batchCondition[0] = currentBatch
 
