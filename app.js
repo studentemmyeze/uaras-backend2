@@ -3198,7 +3198,10 @@ function isNullOrUndefined (value) {
 async function getStudentRegistrationInfo(ii,regNo, type, projectM) {
     // else {
     let toSend2 = {}
-    let type2 = 0
+    let type2 = 0;
+
+
+    // catch {School = 'UNIZIK'}
     const r1 = await recordsFromATableGrab(type,regNo, mainTableName[type],true)
     // console.log('...retrieved student record', r1)
     const toSend = r1.length < 1  ? undefined : r1
@@ -3232,10 +3235,25 @@ async function getStudentRegistrationInfo(ii,regNo, type, projectM) {
         return toSend2
     }
     else if (type === "UTME") {
+
+        try {
+            const aphone = toSend[0]['phone']
+            if (!isNullOrUndefined(aphone) && aphone !== '' &&  aphone !== ' ' && aphone !== 0 && aphone !== '0'){
+                type2 = parseInt(aphone)
+            }
+            else {type2 = 0;}
+        }
+        catch (e) {
+            type2 = 0
+            return e
+        }
+
+
+
         try {
 
 
-            type2 = isNullOrUndefined(toSend[0]['phone']) ? 0 : parseInt(toSend[0]['phone']);
+            // type2 = isNullOrUndefined(toSend[0]['phone']) || toSend[0]['phone'] === 0 ? 0 : parseInt(toSend[0]['phone']);
             const ajson =
                 {
                     score: toSend[0]['utme_aggregate'],
