@@ -510,19 +510,31 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample, phone) 
         //           type2 = toSend[0]['phone'] ? toSend[0]['phone'] : 0
         // console.log('r1::', r1)
         // console.log('r1[0]::', r1[0])
-        // console.log('this is phone::', (phone))
-        // console.log('this is phone to string::', isNullOrUndefined(phone))
+        console.log('this is phone::', (phone))
+        console.log('this is phone function::', isNullOrUndefined(phone))
 
 
         if (r1.length > 0) {
             // const recommendObj = JSON.parse(toSendSample.recommendation)
+
+            let School = "";
+            try {
+                if (!isNullOrUndefined(phone) && phone !== ''){
+                    if (phone.toString() ==="1") {School = "UMUNZE" }
+                    if (phone.toString() ==="2") {School = "AUCHI" }
+                    if (phone.toString() ==="3") {School = "POPE JOHN" }
+                    if (phone.toString() ==="4") {School = "ESCET" }
+                }
+                else {School = 'UNIZIK'}
+            }
+            catch {School = 'UNIZIK'}
+
+
             const newJSON =
                 {reg_num: toSendSample.reg_num , department: toSendSample.department,
 
                     // school: recommendObj.Info ? recommendObj.Info : 'UNIZIK',
-                         school: !isNullOrUndefined(phone)  ? (
-                                     (phone).toString() ==="1" ? "UMUNZE" :
-                                         ((phone.toString()  ==="2" ? "AUCHI":(phone.toString()  ==="3" ? "POPE JOHN" : "ESCET"))) ): 'UNIZIK' ,
+                         school: School ,
                     student_type: toSendSample.student_type,
                     recommendation: toSendSample.recommendation, qualified: toSendSample.qualified}
                     // try {
@@ -544,8 +556,8 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample, phone) 
             const h2 = crypto.createHash('sha1').update(`${JSON.stringify(r1[0])}`).digest('hex')
 
 
-            // console.log("r1 from SavedTable::",r1[0])
-            console.log("newJSON from saved table",newJSON)
+            console.log("r1 from SavedTable::",r1[0])
+            console.log("newJSON from to save",newJSON)
             // console.log('this is phone::', (phone))
             // console.log('this is phone to string::', (phone).toString())
 
