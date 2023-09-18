@@ -519,7 +519,7 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample, phone) 
 
             let School = "";
             try {
-                if (!isNullOrUndefined(phone) && phone !== ''){
+                if (!isNullOrUndefined(phone) && phone !== '' && phone !== ' '){
                     if (phone.toString() ==="1") {School = "UMUNZE" }
                     if (phone.toString() ==="2") {School = "AUCHI" }
                     if (phone.toString() ==="3") {School = "POPE JOHN" }
@@ -1158,7 +1158,7 @@ async function addRecord2(type,tableName, toSendSample, phone='') {
     // console.log("to send reg no::", toSendSample.reg_num)
     let School = "";
     try {
-        if (!isNullOrUndefined(phone) && phone !== ''){
+        if (!isNullOrUndefined(phone) && phone !== '' &&  phone !== ' '){
             if (phone.toString() ==="1") {School = "UMUNZE" }
             if (phone.toString() ==="2") {School = "AUCHI" }
             if (phone.toString() ==="3") {School = "POPE JOHN" }
