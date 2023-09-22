@@ -196,6 +196,10 @@ const pushStatusMessage = {"UTME":'', "DE":'', "PRE":'',"JUPEB":'',"SUP":'', "PO
 const pushTime_taken_string = {"UTME":'', "DE":'', "PRE":'',"JUPEB":'',"SUP":'', "POSTUTME":'', "SAVEUTMESTATUS": []};
 const pushDate_start = {"UTME":new Date(), "DE":new Date(), "PRE":new Date(),"JUPEB":new Date(),"SUP":new Date(), "POSTUTME":new Date()};
 const pushDataProcessed = {"UTME":[], "DE":[], "PRE":[],"JUPEB":[],"SUP":[], "POSTUTME":[], "SAVEUTMESTATUS": []};
+
+const pushDataNotSaved = {"UTME":[], "DE":[], "PRE":[],"JUPEB":[],"SUP":[], "POSTUTME":[]};
+
+
 const pushDataNotProcessed = {"UTME":[], "DE":[], "PRE":[],"JUPEB":[],"SUP":[], "POSTUTME":[], "SAVEUTMESTATUS": []};
 const successBatchCount = {"UTME":0, "DE":0, "PRE":0,"JUPEB":0,"SUP":0, "POSTUTME":0, "SAVEUTMESTATUS": 0};
 
@@ -285,18 +289,11 @@ function waitforme(ms)  {
 }
 
 async function updateStudentRecordSave(type,tableName,toSendSample) {
-    queryTemp = ''
+    let queryTemp = ''
     if (type === "SAVEUTMESTATUS") {
         queryTemp = `UPDATE ${tableName}
-    SET department = '${await checkForApostro(toSendSample.department)}',
-
-    school = '${toSendSample.school}',
-
-    recommendation  = '${toSendSample.recommendation}',
-
-    qualified = ${toSendSample.qualified}
-
-    WHERE reg_num = '${toSendSample.reg_num}';`;
+    SET department = '${await checkForApostro((toSendSample.department).toString())}', school = '${(toSendSample.school).toString()}', recommendation  = '${toSendSample.recommendation}',
+    qualified = ${toSendSample.qualified} WHERE reg_num = '${toSendSample.reg_num}';`;
     }
 
     // console.log("update query::", queryTemp)
@@ -1169,22 +1166,16 @@ async function addRecord2(type,tableName, toSendSample, phone='') {
     catch {School = 'UNIZIK'}
     console.log('SCHOOL TO BE SAVED::', School)
     queryTemp = `INSERT INTO ${tableName} (
-    reg_num, lastname, firstname, middlename, sex, state, utme_aggregate, department, faculty,
-    lga, subject_1, subject_1_score, subject_2,
+    reg_num, lastname, firstname, middlename, sex, state, utme_aggregate, department, faculty, lga, subject_1, subject_1_score, subject_2,
     subject_2_score, subject_3, subject_3_score, english_score, school, student_type, recommendation, qualified)
 
  VALUES ('${toSendSample.reg_num}', '${await checkForApostro(toSendSample.lastname)}',
- '${await checkForApostro(toSendSample.firstname)}',
- '${await checkForApostro(toSendSample.middlename)}',
+ '${await checkForApostro(toSendSample.firstname)}','${await checkForApostro(toSendSample.middlename)}',
  '${toSendSample.sex}', '${await checkForApostro(toSendSample.state)}',
  ${toSendSample.utme_aggregate ? toSendSample.utme_aggregate : ''}, '${await checkForApostro(toSendSample.department)}', '${toSendSample.faculty}',
  '${await checkForApostro(toSendSample.lga)}', '${toSendSample.subject_1}', ${toSendSample.subject_1_score ? toSendSample.subject_1_score : ''},
  '${toSendSample.subject_2}', ${toSendSample.subject_2_score ? toSendSample.subject_2_score : ''}, '${toSendSample.subject_3}',
- ${toSendSample.subject_3_score ? toSendSample.subject_3_score : ''}, ${toSendSample.english_score ? toSendSample.english_score : ''},
- '${School}',
-
- ${toSendSample.student_type}, '${toSendSample.recommendation}', ${toSendSample.qualified}
-)`
+ ${toSendSample.subject_3_score ? toSendSample.subject_3_score : ''}, ${toSendSample.english_score ? toSendSample.english_score : ''}, '${School}', ${toSendSample.student_type}, '${toSendSample.recommendation}', ${toSendSample.qualified})`
 
 // console.log(queryTemp)
 // console.log("\n")
@@ -1392,6 +1383,7 @@ async function getPushStat(type) {
         pushParams: pushParams[type],
         status_message: pushStatusMessage[type],
         time_taken: pushTime_taken_string[type],
+        total_not_saved:pushDataNotSaved[type],
         total_rowdata_pushed_to_api: pushDataProcessed[type].length, //successful push regno
         total_successful_batch: successBatchCount[type],
         total_error: pushDataNotProcessed[type].length,
@@ -1719,7 +1711,7 @@ async function onFileuploadDE(req, res) {
     var schoolType = req.body.type
     console.log("IN DE")
 
-    if (uploadStatus[type] != 'ready' && uploadStatus[type] != 'success') {
+    if (uploadStatus[type] !== 'ready' && uploadStatus[type] !== 'success') {
         res.status(204).json({
             message: "An upload operation is still ongoing. Try again later",
         });
@@ -1773,13 +1765,13 @@ async function onFileuploadDE(req, res) {
         }
         console.log("IN DE- after check if main table exists")
 
-        try {
-            await closeConnection()
-            uploadStatusMessage[type] = uploadStatusMessage[type] + '\closing the DB'
-            
-        } catch (error) {
-            console.log('db closing error', error)
-        }
+        // try {
+        //     await closeConnection()
+        //     uploadStatusMessage[type] = uploadStatusMessage[type] + '\closing the DB'
+        //
+        // } catch (error) {
+        //     console.log('db closing error', error)
+        // }
 
         time_taken_string[type] = await getTimeTaken(type);
         uploadStatus[type] = 'success'
@@ -2258,7 +2250,13 @@ async function onStudentsRecordSendSave(req, res) {
             const response = await requestWithRetry (i,aRegNo,type, projectManagers)
             // console.log("this is projectManagers", projectManagers)
             // console.log('phone::', regNoList[i]['phone'])
-            await saveDetailsOfPush('SAVEUTMESTATUS', projectManagers[itemNo], regNoList[i]['phone'])
+            try {
+                await saveDetailsOfPush('SAVEUTMESTATUS', projectManagers[itemNo], regNoList[i]['phone'])
+            }
+            catch (e) {
+                pushDataNotSaved[type].push(aRegNo);
+            }
+
 
             if (i % batchNo === 0 && i !== 0) {
                 currentBatch += 1
