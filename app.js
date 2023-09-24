@@ -1155,7 +1155,7 @@ async function addRecord2(type,tableName, toSendSample, phone='') {
     // console.log("to send reg no::", toSendSample.reg_num)
     let School = "";
     try {
-        if (!isNullOrUndefined(phone) && phone !== '' &&  phone !== ' ' && phone !== 0 && phone !== '0'){
+        if (!isNullOrUndefined(phone) && phone !== '' &&  phone !== ' ' && phone !== '0'){
             if (phone.toString() ==="1") {School = "UMUNZE" }
             if (phone.toString() ==="2") {School = "AUCHI" }
             if (phone.toString() ==="3") {School = "POPE JOHN" }
@@ -1165,7 +1165,7 @@ async function addRecord2(type,tableName, toSendSample, phone='') {
     }
     catch {School = 'UNIZIK'}
     console.log('SCHOOL TO BE SAVED::', School)
-    queryTemp = `INSERT INTO ${tableName} (
+    let queryTemp = `INSERT INTO ${tableName} (
     reg_num, lastname, firstname, middlename, sex, state, utme_aggregate, department, faculty, lga, subject_1, subject_1_score, subject_2,
     subject_2_score, subject_3, subject_3_score, english_score, school, student_type, recommendation, qualified)
 
@@ -1549,8 +1549,8 @@ async function onFileupload(req, res) {
         // if h1 === h2 skip else replace main table record with temp table record
 
 
-        var readExcel = true;
-        var uploadSuccess = true;
+        let readExcel = true;
+        let uploadSuccess = true;
         try {
             await getExcelData(type, req.files.file.data)
             console.log("done reading excel..")
@@ -1608,13 +1608,13 @@ async function onFileupload(req, res) {
                 time_taken_string[type] = await getTimeTaken(type);
                 uploadStatus[type] = 'success'
                 lastOpStat = await getStat(type)
-                try {
-                    await closeConnection()
-                    uploadStatusMessage[type] = uploadStatusMessage[type] + '\closing the DB'
-                    
-                } catch (error) {
-                    console.log('db closing error', error)
-                }
+                // try {
+                //     await closeConnection()
+                //     uploadStatusMessage[type] = uploadStatusMessage[type] + '\closing the DB'
+                //
+                // } catch (error) {
+                //     console.log('db closing error', error)
+                // }
             } catch (error) {
                 uploadSuccess = false;
                 console.log("error writing to the database ..")
@@ -1708,7 +1708,7 @@ async function onFileupload2(req, res) {
 app.route('/api/uploaddecandidate').post(onFileuploadDE)
 async function onFileuploadDE(req, res) {
     let type ='DE'
-    var schoolType = req.body.type
+    let schoolType = req.body.type
     console.log("IN DE")
 
     if (uploadStatus[type] !== 'ready' && uploadStatus[type] !== 'success') {
@@ -1808,7 +1808,7 @@ async function onFileuploadPRE(req, res) {
 
 
     await getExcelData(type, req.files.file.data)
-    makeConnection()
+    await makeConnection()
     // check if temp table exists // delete if it exists
     // if (await checkTableExists(tempTableName)) {await deleteTable(tempTableName)}
     // create temp table
@@ -2158,11 +2158,11 @@ async function postChukaBatch(batchList, cPM)  {
 
 }
 
-async function waitForServerProcess(adelays) {
-    console.log("delay start", new Date())
-    await wait(1000 * adelays);
-    console.log("delay end", new Date())
-}
+// async function waitForServerProcess(adelays) {
+//     console.log("delay start", new Date())
+//     await wait(1000 * adelays);
+//     console.log("delay end", new Date())
+// }
 
 app.route('/api/push-to-chuka-save').get(onStudentsRecordSendSave)
 async function onStudentsRecordSendSave(req, res) {
@@ -2560,7 +2560,7 @@ async function onStudentSyncCheck(req, res) {
         const aRegNo = regNoList[i]
         const response = await requestWithRetry_sync_issues (i,aRegNo,type, projectManagers)
 
-        if ((i % batchNo === 0 && i != 0) || (i+ 1 === total)) {
+        if ((i % batchNo === 0 && i !== 0) || (i+ 1 === total)) {
             var result_total = projectManagers.length
 
             // prepare the json object
@@ -2940,7 +2940,7 @@ async function readJSONChuka(batch = 0) {
 }
 async function writeJSONChuka(jsonList, batch) {
     let data = []
-    if (batch !=0) {
+    if (batch !== 0) {
         var old = await readJSONChuka(batch - 1);
         for (let i = 0; i < jsonList.length; i++) {old.push(jsonList[i]);}
         data = JSON.stringify(old);
@@ -3493,7 +3493,7 @@ async function onStudenRecordGet(req, res) {
                 .then(data => {
                     console.log("data from suggest dep::", data)
 
-                    if (data.combostatus != 200) {qualified = 0}
+                    if (data.combostatus !== 200) {qualified = 0}
                     if (!qualified && data.combostatus === 202) {
                         if (toSend[0]['utme_aggregate'] >= 160) {
                             if (data.suggest.length > 0) {
@@ -3535,7 +3535,7 @@ async function onStudenRecordGet(req, res) {
 
                     // console.log("TO SEND2", toSend2)
 
-                    if (toSend2 && data.combostatus != 500) {
+                    if (toSend2 && data.combostatus !== 500) {
 
                         res.status(200).json({
                             studentRecord: toSend2,
@@ -3783,7 +3783,7 @@ async function getPassmark(req, res) {
     catch {console.log("error reading error")}
     // var condition = req.query.option
     var queryTemp = "SELECT * FROM uaras_utme_passmark"
-    if (condition != 1) {queryTemp = `SELECT passmark FROM uaras_utme_passmark WHERE current = true`;}
+    if (condition !== 1) {queryTemp = `SELECT passmark FROM uaras_utme_passmark WHERE current = true`;}
     const answer = await doQuery(queryTemp)
     console.log('.....retrieved passmark:::')
     try {
