@@ -359,7 +359,7 @@ async function updateStudentRecord(type,tableName,i, schoolType='') {
         queryTemp = `UPDATE ${tableName}
     SET fullname = '${await checkForApostro(tempUTME[type][i].RG_CANDNAME)}',
     sex = '${tempUTME[type][i].RG_SEX}',
-    state = '${await checkForApostro(tempUTME[type][i].STATE_NAME)}',
+    state = '${await checkForApostro(tempUTME[type][i].STATENAME)}',
 
     department = '${await checkForApostro(tempUTME[type][i].CO_NAME)}',
     lga = '${await checkForApostro(tempUTME[type][i].LGA)}'
@@ -435,7 +435,7 @@ async function updateStudentRecord_Registrations(type,tableName, record) {
         queryTemp = `UPDATE ${tableName}
     SET fullname = '${await checkForApostro(tempUTME[type][i].RG_CANDNAME)}',
     sex = '${tempUTME[type][i].RG_SEX}',
-    state = '${await checkForApostro(tempUTME[type][i].STATE_NAME)}',
+    state = '${await checkForApostro(tempUTME[type][i].STATENAME)}',
 
     department = '${await checkForApostro(tempUTME[type][i].CO_NAME)}',
     lga = '${await checkForApostro(tempUTME[type][i].LGA)}'
@@ -2186,8 +2186,8 @@ async function onStudentsRecordSendSave(req, res) {
         let batchNo = 100;
         let currentBatch = 0;
         let itemNo = 0;
-        var projectManagers = []
-        var issuesBatches = []
+        let projectManagers = []
+        let issuesBatches = []
         const start = req.query.start
         const stop = req.query.stop
         const dateLast = req.query.datelast
@@ -2198,7 +2198,7 @@ async function onStudentsRecordSendSave(req, res) {
         if (bSize) {
             batchNo = bSize
         }
-        if (delayspec) {delays = delayspec}
+        // if (delayspec) {delays = delayspec}
 
 
 
@@ -2450,7 +2450,7 @@ app.route('/api/push-to-chuka-de').get(onStudentsRecordSendDE)
 async function onStudentsRecordSendDE(req, res) {
     let type = "DE"
     let batchNo = 100;
-    currentBatch = 0;
+    let currentBatch = 0;
     var projectManagers = []
     var issuesBatches = []
     const start = req.query.start
@@ -2639,8 +2639,8 @@ async function onStudentSyncCheck2(req, res) {
         oldJList.push(oldJ[i].j_reg)
     }
     for (let i = 0; i < end_oldJ;  i++) {
-        var found22 = false
-        for (let j = 0; j < end_newJ && (found22 != true); j++) {
+        let found22 = false
+        for (let j = 0; j < end_newJ && (found22 !== true); j++) {
             // if (!(oldJList[i] in newJList) && oldJ[i].total > 159) {
             //   diff.push(oldJ[i])
             // }
