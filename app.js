@@ -328,7 +328,7 @@ async function updateStudentRecord(type,tableName,i, schoolType='') {
     utme_aggregate = ${tempUTME[type][i].RG_AGGREGATE},
     department = '${await checkForApostro(tempUTME[type][i].CO_NAME)}',
     lga = '${await checkForApostro(tempUTME[type][i].LGA_NAME)}', subject_1 = '${tempUTME[type][i].Subject1}',
-    subject_1_score = ${tempUTME[type][i].RG_Sub1Score}, phone='${type22}',
+    subject_1_score = ${tempUTME[type][i].RG_Sub1Score}, phone='${schoolType.toString()}',
     subject_2 = '${tempUTME[type][i].Subject2}', subject_2_score = ${tempUTME[type][i].RG_Sub2Score},
     subject_3 = '${tempUTME[type][i].Subject3}', subject_3_score = ${tempUTME[type][i].RG_Sub3Score},
     english_score = ${tempUTME[type][i].EngScore} WHERE reg_num = '${tempUTME[type][i].RG_NUM}';`;
@@ -353,7 +353,18 @@ async function updateStudentRecord(type,tableName,i, schoolType='') {
 
 
 
+    else if (type === "DE" && schoolType !== '') {
+        queryTemp = `UPDATE ${tableName}
+    SET fullname = '${await checkForApostro(tempUTME[type][i].RG_CANDNAME)}',
+    sex = '${tempUTME[type][i].RG_SEX}', phone='${schoolType.toString()}',
+    state = '${await checkForApostro(tempUTME[type][i].STATENAME)}',
 
+    department = '${await checkForApostro(tempUTME[type][i].CO_NAME)}',
+    lga = '${await checkForApostro(tempUTME[type][i].LGA)}'
+    WHERE reg_num = '${tempUTME[type][i].RG_NUM}'`;
+
+
+    }
 
     else if (type === "DE") {
         queryTemp = `UPDATE ${tableName}
@@ -1664,6 +1675,7 @@ async function onFileupload(req, res) {
 }
 async function onFileupload2(req, res) {
     let type ='UTME'
+    let schoolType = type;
     resetVariables(type)
     // for each record in the temp table
     // hash that record h1
@@ -1681,14 +1693,14 @@ async function onFileupload2(req, res) {
     // create temp table
     await createTable(type,tempTableName[type])
     if (tempUTME && tempUTME[type]) {
-        await addRecords(type,tempTableName[type])
+        await addRecords(type,tempTableName[type],schoolType)
     }
     if (await checkTableExists(mainTableName[type])) {
-        await matchUTMECandidateHash(type,mainTableName[type], tempTableName[type])
+        await matchUTMECandidateHash(type,mainTableName[type], tempTableName[type], schoolType)
     }
     else {
         await createTable(mainTableName[type])
-        await addRecords(type,mainTableName[type])
+        await addRecords(type,mainTableName[type], schoolType)
     }
 
     closeConnection()
