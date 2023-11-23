@@ -3219,12 +3219,32 @@ async function getStudentRegistrationInfo(ii,regNo, type, projectM) {
     let toSend2 = {}
     let type2 = 0;
 
-
+    let recommend = {}
+    let qualified = 1
     // catch {School = 'UNIZIK'}
     const r1 = await recordsFromATableGrab(type,regNo, mainTableName[type],true)
     // console.log('...retrieved student record', r1)
     const toSend = r1.length < 1  ? undefined : r1
+    try {
+        const aphone = toSend[0]['phone']
+        if (!isNullOrUndefined(aphone) && aphone !== '' &&  aphone !== ' ' && aphone !== 0 && aphone !== '0'){
+            type2 = parseInt(aphone)
+        }
+        else {type2 = 0;}
+    }
+    catch (e) {
+        type2 = 0
+        return e
+    }
     if (type === "DE") {
+
+        recommend = type2.toString() === '0' ? recommend : {
+            Info: type2.toString() ==="1" ? "UMUNZE" :
+                (type2.toString() ==="2" ? "AUCHI":(type2.toString() ==="3" ? "POPE JOHN" : "ESCET"))
+
+        }
+
+
         toSend2 = {
             reg_num: toSend[0]['reg_num'],
             lastname: toSend[0]['fullname'].split(' ')[0],
@@ -3244,7 +3264,7 @@ async function getStudentRegistrationInfo(ii,regNo, type, projectM) {
             subject_3_score: '',
             english_score: '',
             student_type:2,
-            recommendation: JSON.stringify({}),
+            recommendation: JSON.stringify(recommend),
             qualified: 1
 
 
@@ -3255,17 +3275,17 @@ async function getStudentRegistrationInfo(ii,regNo, type, projectM) {
     }
     else if (type === "UTME") {
 
-        try {
-            const aphone = toSend[0]['phone']
-            if (!isNullOrUndefined(aphone) && aphone !== '' &&  aphone !== ' ' && aphone !== 0 && aphone !== '0'){
-                type2 = parseInt(aphone)
-            }
-            else {type2 = 0;}
-        }
-        catch (e) {
-            type2 = 0
-            return e
-        }
+        // try {
+        //     const aphone = toSend[0]['phone']
+        //     if (!isNullOrUndefined(aphone) && aphone !== '' &&  aphone !== ' ' && aphone !== 0 && aphone !== '0'){
+        //         type2 = parseInt(aphone)
+        //     }
+        //     else {type2 = 0;}
+        // }
+        // catch (e) {
+        //     type2 = 0
+        //     return e
+        // }
 
 
 
@@ -3288,8 +3308,7 @@ async function getStudentRegistrationInfo(ii,regNo, type, projectM) {
             let affiliateLower = ['Paul University, Awka',
                 'Peter University, Achina-Onneh',
                 'Legacy University, Okija']
-            let recommend = {}
-            let qualified = 1
+
             const url = pythonUrl + `/api/suggest-departments/${encodeURIComponent(JSON.stringify(ajson))}`;
 
             // handles affiliate recommendations
