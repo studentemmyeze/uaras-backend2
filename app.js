@@ -603,10 +603,10 @@ async function matchUTMECandidateHash(type,tableName, tempTableName, schoolType=
     for (let i = 0; i < tempUTME[type].length; i++) {
         // for (let i = 0; i < 25; i++) {
 
-        const r1 = await recordsFromATableGrab(type,tempUTME[type][i].RG_NUM, tableName)
+        const r1 = await recordsFromATableGrab(type,tempUTME[type][i].RG_NUM, tableName, true)
         // console.log('..record grabbed ', r1)
         if (r1.length > 0) { // the record has been entered into the main table before
-            const r2 = await recordsFromATableGrab(type,tempUTME[type][i].RG_NUM, tempTableName)
+            const r2 = await recordsFromATableGrab(type,tempUTME[type][i].RG_NUM, tempTableName, true)
             const h1 = crypto.createHash('sha1').update(`${JSON.stringify(r1[0])}`).digest('hex')
             const h2 = crypto.createHash('sha1').update(`${JSON.stringify(r2[0])}`).digest('hex')
             if (h1 !== h2) {
