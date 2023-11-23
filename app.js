@@ -524,7 +524,10 @@ async function matchUTMECandidateHashSaved(type,tableName, toSendSample, phone) 
                 }
                 else {School = 'UNIZIK'}
             }
-            catch {School = 'UNIZIK'}
+            catch {
+                console.log('@528error checking phone-', phone);
+                School = 'UNIZIK'
+            }
 
 
             const newJSON =
