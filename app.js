@@ -1166,7 +1166,10 @@ async function addRecord2(type,tableName, toSendSample, phone='') {
         }
         else {School = 'UNIZIK'}
     }
-    catch {School = 'UNIZIK'}
+    catch {
+        console.log('@528error checking phone-', phone);
+        School = 'UNIZIK'
+    }
     console.log('SCHOOL TO BE SAVED::', School)
     let queryTemp = `INSERT INTO ${tableName} (
     reg_num, lastname, firstname, middlename, sex, state, utme_aggregate, department, faculty, lga, subject_1, subject_1_score, subject_2,
