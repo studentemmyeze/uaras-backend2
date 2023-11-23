@@ -1533,7 +1533,7 @@ async function onFileupload(req, res) {
     // type22 = req.body.type
     const schoolType = req.body.type
     
-    console.log("in uploadutme umunze-1, auchi-2..", schoolType)
+    console.log("in uploadutme umunze-1, auchi-2..::", schoolType)
     if (uploadStatus[type] !== 'ready' && uploadStatus[type] !== 'success') {
         res.status(204).json({
             message: "An upload operation is still ongoing. Try again later",
@@ -2789,7 +2789,7 @@ async function getStudentRegistrationInfo_sync_issues(ii,regNo, type, projectM) 
         ]
         var affiliateLower = ['Paul University, Awka',
             'Peter University, Achina-Onneh',
-            'Legacy University, Okija']
+            'Legacy University, Okija']
         var recommend = {}
         var qualified = 1
         const url = pythonUrl + `/api/suggest-departments/${encodeURIComponent(JSON.stringify(ajson))}`;
@@ -3113,7 +3113,7 @@ async function getAllRegNoMain(start, stop,
 
     }
     else{
-        queryTemp = `SELECT reg_num FROM ${mainTableName[type]}
+        queryTemp = `SELECT reg_num , phone FROM ${mainTableName[type]}
   `
     }
     const answer = await doQuery(queryTemp)
@@ -3266,7 +3266,7 @@ async function getStudentRegistrationInfo(ii,regNo, type, projectM) {
             ]
             let affiliateLower = ['Paul University, Awka',
                 'Peter University, Achina-Onneh',
-                'Legacy University, Okija']
+                'Legacy University, Okija']
             let recommend = {}
             let qualified = 1
             const url = pythonUrl + `/api/suggest-departments/${encodeURIComponent(JSON.stringify(ajson))}`;
@@ -3473,7 +3473,7 @@ async function onStudenRecordGet(req, res) {
             ]
             var affiliateLower = ['Paul University, Awka',
                 'Peter University, Achina-Onneh',
-                'Legacy University, Okija']
+                'Legacy University, Okija']
             var recommend = {}
             var qualified = 1
 
