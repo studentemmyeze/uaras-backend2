@@ -1039,12 +1039,12 @@ async function lgaFromATableGrab(type, tableName) {
 
 }
 
-async function protectedRecordFromATableGrab(type, regNo, tableName, utmesubjects =[]) {
+async function protectedRecordFromATableGrab(type, regNo, tableName, lga="", utmesubjects =[]) {
     // console.log("@RECORDS FROM A TABLE GRAB", type)
 
     var sql = ""
     if (type === "UTME") {
-        if (utmesubjects.length === 3) {
+        if (utmesubjects.length === 3 && lga !== "") {
             sql = `SELECT
   reg_num, fullname, sex, state, utme_aggregate, department, lga, subject_1, subject_1_score, subject_2,
   subject_2_score, subject_3, subject_3_score, english_score, phone, email, password, bio_data
@@ -2157,7 +2157,7 @@ async function onStudenRecordGet3(req, res) {
     console.log('...received request type = ', req.query.type)
     // const tableName = ""
     // console.log('received regno to query:::', req.query.regNo)
-    if (c1 && c2 && c3) {const r1 = await protectedRecordFromATableGrab(type,regNo, mainTableName[type],[c1,c2,c3])}
+    if (c1 && c2 && c3 && lga) {const r1 = await protectedRecordFromATableGrab(type,regNo, mainTableName[type], lga,[c1,c2,c3])}
     else {const r1 = await protectedRecordFromATableGrab(type,regNo, mainTableName[type])}
 
     // console.log('retrieved No:::', req.query.regNo)
@@ -2241,15 +2241,19 @@ async function getLga(req, res) {
     // console.log('retrieved record:::', r1)
     try {
         const toSend = r1.length < 1  ? undefined : r1
+        const toSend2 = []
+        toSend.forEach(e => {
+            toSend2.push(e['lga'])
+        })
         // console.log('toSend', toSend)
-        if (toSend) {
+        if (toSend2) {
             res.status(200).json({
-                lga: toSend, status: 200
+                lga: toSend2, status: 200
             });
         }
         else {
             res.status(202).json({
-                lga: toSend, status: 202
+                lga: toSend2, status: 202
             });
         }
 
