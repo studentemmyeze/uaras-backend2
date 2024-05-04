@@ -1076,6 +1076,8 @@ async function protectedRecordFromATableGrab(type, regNo, tableName, lga="", utm
 
     }
 
+    console.log('query::' , sql)
+
     const result = await doQuery(sql)
     return result
 
@@ -2161,7 +2163,7 @@ async function onStudenRecordGet3(req, res) {
     else {const r1 = await protectedRecordFromATableGrab(type,regNo, mainTableName[type])}
 
     // console.log('retrieved No:::', req.query.regNo)
-    console.log('...retrieved student record')
+    console.log('...retrieved student record::' , r1)
 
     // console.log('retrieved record:::', r1)
     try {
@@ -2187,8 +2189,8 @@ async function onStudenRecordGet3(req, res) {
 
 
 
-app.route('/api/get-utme-courses').get(getCourses)
-async function getCourses(req, res) {
+app.route('/api/get-utme-subj').get(getSubjects)
+async function getSubjects(req, res) {
     // const type = 'UTME'
     // const regNo = req.query.regNo
     console.log('...received request to grab all courses')
@@ -2206,6 +2208,7 @@ async function getCourses(req, res) {
         // const toSend = r1.length < 1  ? undefined : r1
         // console.log('toSend', toSend)
         if (allValues) {
+            allValues.sort()
             res.status(200).json({
                 courses: allValues, status: 200
             });
@@ -2245,8 +2248,10 @@ async function getLga(req, res) {
         toSend.forEach(e => {
             toSend2.push(e['lga'])
         })
+
         // console.log('toSend', toSend)
         if (toSend2) {
+            toSend2.sort()
             res.status(200).json({
                 lga: toSend2, status: 200
             });
