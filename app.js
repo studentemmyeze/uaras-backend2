@@ -2154,20 +2154,20 @@ async function onStudenRecordGet3(req, res) {
     const c1 = req.query.c1
     const c2 = req.query.c2
     const c3 = req.query.c3
-
+    const r1 = []
     console.log('...received request to grab student info')
     console.log('...received request type = ', req.query.type)
     // const tableName = ""
     // console.log('received regno to query:::', req.query.regNo)
-    if (c1 && c2 && c3 && lga) {const r1 = await protectedRecordFromATableGrab(type,regNo, mainTableName[type], lga,[c1,c2,c3])}
-    else {const r1 = await protectedRecordFromATableGrab(type,regNo, mainTableName[type])}
+    if (c1 && c2 && c3 && lga) { r1.push(await protectedRecordFromATableGrab(type,regNo, mainTableName[type], lga,[c1,c2,c3])) }
+    else { r1.push(await protectedRecordFromATableGrab(type,regNo, mainTableName[type]))}
 
     // console.log('retrieved No:::', req.query.regNo)
-    console.log('...retrieved student record::' , r1)
+    console.log('...retrieved student record::' , r1[0])
 
     // console.log('retrieved record:::', r1)
     try {
-        const toSend = r1.length < 1  ? undefined : r1
+        const toSend = r1[0].length < 1  ? undefined : r1[0]
         // console.log('toSend', toSend)
         if (toSend) {
             res.status(200).json({
