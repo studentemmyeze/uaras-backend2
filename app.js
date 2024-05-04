@@ -13,6 +13,7 @@ const fetch = require('node-fetch');
 var fs = require('fs');
 const { type } = require('os');
 require('dotenv/config');
+const {NULL} = require("mysql/lib/protocol/constants/types");
 
 
 const app = express();
@@ -45,15 +46,34 @@ console.log("===========")
 tkMessage = ""
 const dataListMain = []
 
-// UTME - (RG_NUM,RG_CANDNAME,RG_SEX,STATE_NAME,RG_AGGREGATE,CO_NAME,LGA_NAME,Subject1,RG_Sub1Score,
-//        Subject2,RG_Sub2Score,Subject3,RG_Sub3Score, EngScore)
-// DE- (RG_NUM,RG_CANDNAME,RG_SEX,STATE_NAME,RG_AGGREGATE,CO_NAME,LGA_NAME)
-// PRE- (RG_NUM,RG_CANDNAME,RG_AGGREGATE,PRE_NUM, SUBS,BO4,RG_SEX, STATE_NAME,CO_NAME,LGA_NAME, AVG )
-// JUPEB- (RG_NUM,JUP_NUM,RG_CANDNAME,SUBS,TOT_SCO,FIRST_CO,SECOND_CO, REMK)
-// SUP- (RG_NUM, PREF_CO,SOURCE)
-// Excel format postUTME-(RG_NUM,RG_AGGREGATE,PU_AGGREGATE,CALC_AGGREGATE )
 
-// const app = express();
+course_dict = {
+
+
+    'AGR':	'Agriculture',
+    'ART':	'Art (Fine Art)',
+    'BIO':	'Biology',
+    'CHM':	'Chemistry',
+    'COM':	'Commerce',
+    'CRK':	'Christian Rel. Know',
+    'ECO':	'Economics',
+    'FRE':	'French',
+    'GEO':	'Geography',
+    'GOV':	'Government',
+    'HIS':	'History',
+    'Home ECO':	'Home Economics',
+    'IGB':	'Igbo',
+    'ISS':	'Islamic Studies',
+    'LIT':	'Lit. in English',
+    'MTH':	'Mathematics',
+    'Music':	'Music',
+    'PHY':	'Physics',
+    'POA':	'Princ. of Account',
+    'Yoruba':	'Yoruba',
+    'COS': 'Computer Studies',
+    'PHE':'Physical and Health Education'
+
+}
 
 var tempUTME = {"UTME":[], "DE":[], "PRE":[],"JUPEB":[],"SUP":[], "POSTUTME":[]};
 const mainTableName = {
@@ -998,6 +1018,69 @@ async function recordsFromATableGrab(type, regNo, tableName, condition=false) {
     return result
 
 }
+
+async function lgaFromATableGrab(type, tableName) {
+    // console.log("@RECORDS FROM A TABLE GRAB", type)
+
+    var sql = ""
+    if (type === "UTME") {
+
+            sql = `SELECT DISTINCT(lga) FROM ${tableName} 
+  `}
+
+    else if (type === "DE") {
+  //       sql = `SELECT reg_num, fullname, sex, state, department, lga, phone
+  // FROM ${tableName} WHERE reg_num = '${regNo}'`;
+
+    }
+
+    const result = await doQuery(sql)
+    return result
+
+}
+
+async function protectedRecordFromATableGrab(type, regNo, tableName, utmesubjects =[]) {
+    // console.log("@RECORDS FROM A TABLE GRAB", type)
+
+    var sql = ""
+    if (type === "UTME") {
+        if (utmesubjects.length === 3) {
+            sql = `SELECT
+  reg_num, fullname, sex, state, utme_aggregate, department, lga, subject_1, subject_1_score, subject_2,
+  subject_2_score, subject_3, subject_3_score, english_score, phone, email, password, bio_data
+  FROM ${tableName} WHERE reg_num = '${regNo}' and
+   (subject_1 = '${utmesubjects[0]}' or subject_2 = '${utmesubjects[0]}' or subject_3 = '${utmesubjects[0]}') and 
+(subject_1 = '${utmesubjects[1]}' or subject_2 = '${utmesubjects[1]}' or subject_3 = '${utmesubjects[1]}') and 
+(subject_1 = '${utmesubjects[2]}' or subject_2 = '${utmesubjects[2]}' or subject_3 = '${utmesubjects[2]}')
+  
+  
+  `
+        }
+        else {
+            sql = `SELECT
+  reg_num
+  FROM ${tableName} WHERE reg_num = '${regNo}'
+  `
+        }
+    }
+
+    else if (type === "SAVEUTMESTATUS") {
+        sql = `SELECT
+  reg_num, department, school, student_type, recommendation, qualified
+  FROM ${tableName} WHERE reg_num = '${regNo}'
+  `
+    }
+    else if (type === "DE") {
+        sql = `SELECT reg_num, fullname, sex, state, department, lga, phone
+  FROM ${tableName} WHERE reg_num = '${regNo}'`;
+
+    }
+
+    const result = await doQuery(sql)
+    return result
+
+}
+
 
 
 async function grabDepartmentCutoff(type, department, tableName) {
@@ -2061,6 +2144,123 @@ async function onStudenRecordGet2(req, res) {
     }
 }
 
+app.route('/api/check-valid-regno3').get(onStudenRecordGet3)
+async function onStudenRecordGet3(req, res) {
+    const type = 'UTME'
+    const regNo = req.query.regNo
+    const lga = req.query.lga
+    const c1 = req.query.c1
+    const c2 = req.query.c2
+    const c3 = req.query.c3
+
+    console.log('...received request to grab student info')
+    console.log('...received request type = ', req.query.type)
+    // const tableName = ""
+    // console.log('received regno to query:::', req.query.regNo)
+    if (c1 && c2 && c3) {const r1 = await protectedRecordFromATableGrab(type,regNo, mainTableName[type],[c1,c2,c3])}
+    else {const r1 = await protectedRecordFromATableGrab(type,regNo, mainTableName[type])}
+
+    // console.log('retrieved No:::', req.query.regNo)
+    console.log('...retrieved student record')
+
+    // console.log('retrieved record:::', r1)
+    try {
+        const toSend = r1.length < 1  ? undefined : r1
+        // console.log('toSend', toSend)
+        if (toSend) {
+            res.status(200).json({
+                studentRecord: toSend, status: 200
+            });
+        }
+        else {
+            res.status(202).json({
+                studentRecord: toSend, status: 202
+            });
+        }
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to retrieve record",
+        });
+    }
+}
+
+
+
+app.route('/api/get-utme-courses').get(getCourses)
+async function getCourses(req, res) {
+    // const type = 'UTME'
+    // const regNo = req.query.regNo
+    console.log('...received request to grab all courses')
+    // console.log('...received request type = ', req.query.type)
+    // const tableName = ""
+    // console.log('received regno to query:::', req.query.regNo)
+    // const r1 = await recordsFromATableGrab(type,regNo, mainTableName[type],true)
+    // console.log('retrieved No:::', req.query.regNo)
+    const allValues = Object.values(course_dict);
+    // console.log(allValues);
+    // console.log('...retrieved student record')
+
+    // console.log('retrieved record:::', r1)
+    try {
+        // const toSend = r1.length < 1  ? undefined : r1
+        // console.log('toSend', toSend)
+        if (allValues) {
+            res.status(200).json({
+                courses: allValues, status: 200
+            });
+        }
+        else {
+            res.status(202).json({
+                courses: allValues, status: 202
+            });
+        }
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to retrieve courses",
+        });
+    }
+}
+
+app.route('/api/get-lga').get(getLga)
+async function getLga(req, res) {
+    // const type = 'UTME'
+    const type = req.query.type
+    console.log('...received request to grab all lgas')
+    // console.log('...received request type = ', req.query.type)
+    // const tableName = ""
+    // console.log('received regno to query:::', req.query.regNo)
+    const r1 = await lgaFromATableGrab(type,mainTableName[type])
+
+    // console.log('retrieved No:::', req.query.regNo)
+    // const allValues = Object.values(course_dict);
+    // console.log(allValues);
+    // console.log('...retrieved student record')
+
+    // console.log('retrieved record:::', r1)
+    try {
+        const toSend = r1.length < 1  ? undefined : r1
+        // console.log('toSend', toSend)
+        if (toSend) {
+            res.status(200).json({
+                lga: toSend, status: 200
+            });
+        }
+        else {
+            res.status(202).json({
+                lga: toSend, status: 202
+            });
+        }
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to retrieve lgas",
+        });
+    }
+}
+
+
 
 async function onSuggestFromPython(aJSON) {
 
@@ -2994,7 +3194,7 @@ async function writeJSONConfirm(jsonList, filename) {
 }
 
 async function onStudentsRecordBatch(req, res) {
-    let type = "UTME"
+    let type = 'UTME'
     let batchNo = 100;
     currentBatch = 0;
     var projectManagers = []
