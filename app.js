@@ -1076,7 +1076,7 @@ async function protectedRecordFromATableGrab(type, regNo, tableName, lga="", utm
 
     }
 
-    console.log('query::' , sql)
+    // console.log('query::' , sql)
 
     const result = await doQuery(sql)
     return result
@@ -2163,7 +2163,7 @@ async function onStudenRecordGet3(req, res) {
     else { r1.push(await protectedRecordFromATableGrab(type,regNo, mainTableName[type]))}
 
     // console.log('retrieved No:::', req.query.regNo)
-    console.log('...retrieved student record::' , r1[0])
+    // console.log('...retrieved student record::' , r1[0])
 
     // console.log('retrieved record:::', r1)
     try {
