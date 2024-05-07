@@ -1,4 +1,6 @@
+
 const express = require('express');
+require('express-async-errors')
 // https://medium.com/swlh/node-js-how-to-access-mysql-remotely-using-ssh-d45e21221039
 const morgan = require('morgan');
 // const bodyParser = require("body-parser");
@@ -23,7 +25,10 @@ app.listen(3000,()=> {
 // Middleware
 app.use(express.json());
 app.use(morgan('tiny'));
-
+app.use((err,req,res,next) => {
+    console.log(err)
+    res.status(err.status || 500).send("Something went wrong!")
+})
 
 host = process.env.HOST;
 user = process.env.USER;
@@ -2269,6 +2274,64 @@ async function getLga(req, res) {
     }
 }
 
+app.route('/api/create-profile').get(createProfile)
+async function createProfile(req, res) {
+    // const type = 'UTME'
+    const type = req.query.type
+    const regNo = req.query.regNo
+    const email = req.query.email
+    const phone = req.query.phone
+    const password = req.query.password
+
+    // grab the student info
+
+    // encode password
+
+    // make sure confirmed is false
+
+
+    // write data to profile table
+
+    // send confirmation email
+    
+    console.log('...received request to grab all lgas')
+    // console.log('...received request type = ', req.query.type)
+    // const tableName = ""
+    // console.log('received regno to query:::', req.query.regNo)
+    const r1 = await lgaFromATableGrab(type,mainTableName[type])
+
+    // console.log('retrieved No:::', req.query.regNo)
+    // const allValues = Object.values(course_dict);
+    // console.log(allValues);
+    // console.log('...retrieved student record')
+
+    // console.log('retrieved record:::', r1)
+    try {
+        const toSend = r1.length < 1  ? undefined : r1
+        const toSend2 = []
+        toSend.forEach(e => {
+            toSend2.push(e['lga'])
+        })
+
+        // console.log('toSend', toSend)
+        if (toSend2) {
+            toSend2.sort()
+            res.status(200).json({
+                lga: toSend2, status: 200
+            });
+        }
+        else {
+            res.status(202).json({
+                lga: toSend2, status: 202
+            });
+        }
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to retrieve lgas",
+        });
+    }
+}
 
 
 async function onSuggestFromPython(aJSON) {
