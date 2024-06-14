@@ -1062,7 +1062,7 @@ async function protectedRecordFromATableGrab(type, regNo, tableName, lga="", utm
             sql = `SELECT
   reg_num, fullname, sex, state, utme_aggregate, department, lga, subject_1, subject_1_score, subject_2,
   subject_2_score, subject_3, subject_3_score, english_score, phone, email, password, bio_data
-  FROM ${tableName} WHERE reg_num = '${regNo}' and lga = '${lga}'
+  FROM ${tableName} WHERE reg_num = '${regNo}' and lga = '${lga}' and 
    (subject_1 = '${utmesubjects[0]}' or subject_2 = '${utmesubjects[0]}' or subject_3 = '${utmesubjects[0]}') and 
 (subject_1 = '${utmesubjects[1]}' or subject_2 = '${utmesubjects[1]}' or subject_3 = '${utmesubjects[1]}') and 
 (subject_1 = '${utmesubjects[2]}' or subject_2 = '${utmesubjects[2]}' or subject_3 = '${utmesubjects[2]}')
