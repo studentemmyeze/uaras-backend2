@@ -30,10 +30,18 @@ app.use((err,req,res,next) => {
     res.status(err.status || 500).send("Something went wrong!")
 })
 
-host = process.env.HOST;
-user = process.env.USER;
-password = process.env.PASSWORD;
-database = process.env.DATABASE;
+// host = process.env.HOST;
+// user = process.env.USER;
+// password = process.env.PASSWORD;
+// database = process.env.DATABASE;
+
+host = 'mysql.codeeltd.com'
+user = 'uaras'
+password = 'Uaras@2022'
+database = 'uaras'
+
+
+
 pythonUrl = process.env.PYTHONURL;
 apiKey= process.env.APIKEY;
 appSecret = process.env.APPSECRET;
@@ -313,6 +321,7 @@ function waitforme(ms)  {
     return new Promise( resolve => { setTimeout(resolve, ms); });
 }
 
+// checked
 async function updateStudentRecordSave(type,tableName,toSendSample) {
     let queryTemp = ''
     if (type === "SAVEUTMESTATUS") {
@@ -327,7 +336,7 @@ async function updateStudentRecordSave(type,tableName,toSendSample) {
 }
 
 
-
+// checked
 async function updateStudentRecord(type,tableName,i, schoolType='') {
     var queryTemp = ""
 
@@ -455,7 +464,7 @@ async function updateStudentRecord(type,tableName,i, schoolType='') {
 
     await doQuery(queryTemp)
 }
-
+// checked
 async function updateStudentRecord_Registrations(type,tableName, record) {
     var queryTemp = ""
     if (type === "UTME") {
@@ -1053,7 +1062,7 @@ async function protectedRecordFromATableGrab(type, regNo, tableName, lga="", utm
             sql = `SELECT
   reg_num, fullname, sex, state, utme_aggregate, department, lga, subject_1, subject_1_score, subject_2,
   subject_2_score, subject_3, subject_3_score, english_score, phone, email, password, bio_data
-  FROM ${tableName} WHERE reg_num = '${regNo}' and
+  FROM ${tableName} WHERE reg_num = '${regNo}' and lga = '${lga}'
    (subject_1 = '${utmesubjects[0]}' or subject_2 = '${utmesubjects[0]}' or subject_3 = '${utmesubjects[0]}') and 
 (subject_1 = '${utmesubjects[1]}' or subject_2 = '${utmesubjects[1]}' or subject_3 = '${utmesubjects[1]}') and 
 (subject_1 = '${utmesubjects[2]}' or subject_2 = '${utmesubjects[2]}' or subject_3 = '${utmesubjects[2]}')
@@ -2165,7 +2174,10 @@ async function onStudenRecordGet3(req, res) {
     // const tableName = ""
     // console.log('received regno to query:::', req.query.regNo)
     if (c1 && c2 && c3 && lga) { r1.push(await protectedRecordFromATableGrab(type,regNo, mainTableName[type], lga,[c1,c2,c3])) }
-    else { r1.push(await protectedRecordFromATableGrab(type,regNo, mainTableName[type]))}
+    else {
+        r1.push(await protectedRecordFromATableGrab(type,regNo, mainTableName[type]))
+
+    }
 
     // console.log('retrieved No:::', req.query.regNo)
     // console.log('...retrieved student record::' , r1[0])
