@@ -1073,12 +1073,13 @@ async function lgaFromATableGrab(type, tableName) {
     var sql = ""
     if (type === "UTME") {
 
-            sql = `SELECT DISTINCT(lga) FROM ${tableName} 
+            sql = `SELECT DISTINCT(lga)  FROM ${tableName} order by  lga;
+
   `}
 
     else if (type === "DE") {
-  //       sql = `SELECT reg_num, fullname, sex, state, department, lga, phone
-  // FROM ${tableName} WHERE reg_num = '${regNo}'`;
+        sql = `SELECT DISTINCT(lga) FROM ${tableName} order by  lga;
+  `
 
     }
 
@@ -2323,8 +2324,9 @@ async function getLga(req, res) {
         const version = parseInt(req.version);
         const type = req.query.type
         console.log('...received request to grab all lgas')
-        // console.log('...received request type = ', req.query.type)
+        console.log('...received request type = ', req.query.type)
         const tableName = (version === 1 ? testmainTableName[type]: mainTableName[type])
+        console.log('...received request type = ', type, tableName);
         // console.log('received regno to query:::', req.query.regNo)
         const r1 = await lgaFromATableGrab(type, tableName);
 
