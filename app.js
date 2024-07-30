@@ -1,6 +1,8 @@
 
 const express = require('express');
 require('express-async-errors')
+
+
 // https://medium.com/swlh/node-js-how-to-access-mysql-remotely-using-ssh-d45e21221039
 const morgan = require('morgan');
 // const bodyParser = require("body-parser");
@@ -22,9 +24,18 @@ const app = express();
 app.listen(3000,()=> {
     console.log('server is running @ !');
 })
+
+// Middleware to handle versioning
+function apiVersioning(req, res, next) {
+    const version = req.url.split('/')[2]; // Extract version from URL
+    req.version = version[1] || '1'; // Default to version 1
+    next();
+}
+
 // Middleware
 app.use(express.json());
 app.use(morgan('tiny'));
+app.use(apiVersioning);
 app.use((err,req,res,next) => {
     console.log(err)
     res.status(err.status || 500).send("Something went wrong!")
@@ -35,11 +46,12 @@ app.use((err,req,res,next) => {
 // password = process.env.PASSWORD;
 // database = process.env.DATABASE;
 
-host = 'mysql.codeeltd.com'
-user = 'uaras'
-password = 'Uaras@2022'
-database = 'uaras'
 
+
+host = process.env.HOST;
+user = process.env.USERS;
+password = process.env.PASSWORD;
+database = process.env.DATABASE;
 
 
 pythonUrl = process.env.PYTHONURL;
@@ -100,7 +112,28 @@ const mainTableName = {
     "POSTSTATUS": 'uaras_saved_utme_candidate_status'
 }
 
+const testmainTableName = {
+    "UTME":'test_uaras_utme_candidates',
+    "DE":'test_uaras_de_candidates',
+    "PRE":'uaras_prescience_candidates',
+    "JUPEB":'uaras_jupeb_candidates',
+    "SUP":'uaras_sup_candidates',
+    "POSTUTME": 'uaras_putme_score',
+    "UTMEREG": 'uaras_utme_reg',
+    "POSTSTATUS": 'uaras_saved_utme_candidate_status'
+};
+
 const tempTableName = {
+    "UTME":'test_uaras_temp_utme_candidates',
+    "DE":'test_uaras_temp_de_candidates',
+    "PRE":'uaras_temp_prescience_candidates',
+    "JUPEB":'uaras_temp_jupeb_candidates',
+    "SUP":'uaras_temp_sup_candidates',
+    "POSTUTME": 'uaras_temp_putme_score',
+    "PASSMK": 'uaras_utme_passmark'
+}
+
+const testtempTableName = {
     "UTME":'uaras_temp_utme_candidates',
     "DE":'uaras_temp_de_candidates',
     "PRE":'uaras_temp_prescience_candidates',
@@ -1029,6 +1062,7 @@ async function recordsFromATableGrab(type, regNo, tableName, condition=false) {
     }
 
     const result = await doQuery(sql)
+    console.log({result});
     return result
 
 }
@@ -1085,8 +1119,18 @@ async function protectedRecordFromATableGrab(type, regNo, tableName, lga="", utm
   `
     }
     else if (type === "DE") {
-        sql = `SELECT reg_num, fullname, sex, state, department, lga, phone
+        if (lga !== "") {
+            sql = `
+  SELECT reg_num, fullname, sex, state, department, lga, phone
+  FROM ${tableName} WHERE reg_num = '${regNo}' and lga = '${lga}' 
+  
+  `}
+
+        else{
+            sql = `SELECT reg_num, fullname, sex, state, department, lga, phone
   FROM ${tableName} WHERE reg_num = '${regNo}'`;
+        }
+
 
     }
 
@@ -1556,7 +1600,7 @@ var batchCondition = [0,0,0]
 // })
 
 
-app.get('/api/status', async (req, res, next) => {
+app.get('/api/:version/status', async (req, res, next) => {
 // app.route('/api/status').get(onStatusQuery)
 // async function onStatusQuery(req, res) {
     console.log("request", req.query.type)
@@ -1598,7 +1642,7 @@ app.get('/api/status', async (req, res, next) => {
     }
 })
 
-app.get('/api/push-status', async (req, res, next) => {
+app.get('/api/:version/push-status', async (req, res, next) => {
     // app.route('/api/status').get(onStatusQuery)
     // async function onStatusQuery(req, res) {
         console.log("request", req.query.type)
@@ -1642,136 +1686,141 @@ app.get('/api/push-status', async (req, res, next) => {
     
 
 // endpoint for xlsx upload-receive Uploaded UTME
-app.route('/api/uploadutme').post(onFileupload)
+app.route('/api/:version/utme/uploadutme').post(onFileupload)
 
 async function onFileupload(req, res) {
-    const type ='UTME'
-    // type22 = req.body.type
-    const schoolType = req.body.type
-    
-    console.log("in uploadutme umunze-1, auchi-2..::", schoolType)
-    if (uploadStatus[type] !== 'ready' && uploadStatus[type] !== 'success') {
-        res.status(204).json({
-            message: "An upload operation is still ongoing. Try again later",
-        });
-    }
+    if (parseInt(req.version) === 2) {
+        const type = 'UTME'
+        // type22 = req.body.type
+        const schoolType = req.body.type
 
-    else {
-        resetVariables(type)
-        // for each record in the temp table
-        // hash that record h1
-        // get the corresponding record on the main table
-        // hash the main table record, h2
-        // if h1 === h2 skip else replace main table record with temp table record
+        console.log("in uploadutme umunze-1, auchi-2..::", schoolType)
+        if (uploadStatus[type] !== 'ready' && uploadStatus[type] !== 'success') {
+            res.status(204).json({
+                message: "An upload operation is still ongoing. Try again later",
+            });
+        } else {
+            resetVariables(type)
+            // for each record in the temp table
+            // hash that record h1
+            // get the corresponding record on the main table
+            // hash the main table record, h2
+            // if h1 === h2 skip else replace main table record with temp table record
 
 
-        let readExcel = true;
-        let uploadSuccess = true;
-        try {
-            await getExcelData(type, req.files.file.data)
-            console.log("done reading excel..")
-        } catch (error) {
-            readExcel = false
-            console.log("error reading excel..")
-        }
-
-        if (readExcel) {
+            let readExcel = true;
+            let uploadSuccess = true;
             try {
-
-                // makeConnection()
-                uploadStatus[type] = 'busy'
-                uploadStatusMessage[type] = 'busy'
-                try {
-                    await makeConnection()
-                    uploadStatusMessage[type] = uploadStatusMessage[type] + '\connecting to the DB'
-                    
-                } catch (error) {
-                    console.log('db connection error', error)
-                }
-
-                // check if temp table exists // delete if it exists
-                if (await checkTableExists(tempTableName[type])) {
-                    console.log("deleting existing temp UTME table..")
-                    uploadStatusMessage[type] += '\n deleting existing temp UTME table'
-                    await deleteTable(tempTableName[type])
-                }
-                // create temp table
-                uploadStatusMessage[type] += '\n create temp UTME table'
-                console.log("create temp UTME table..")
-
-                await createTable(type,tempTableName[type])
-                if (tempUTME && tempUTME[type]) {
-                    console.log("adding records to the temp UTME table..")
-                    uploadStatusMessage[type] += '\n adding records to the temp UTME table'
-                    await addRecords(type,tempTableName[type], schoolType)
-                }
-                if (await checkTableExists(mainTableName[type])) {
-                    console.log("adding records to the main UTME table..")
-                    uploadStatusMessage[type] += '\n adding records to the main UTME table'
-                    await matchUTMECandidateHash(type,mainTableName[type], tempTableName[type], schoolType)
-                }
-                else {
-                    await createTable(mainTableName[type])
-                    console.log("adding records to the main UTME table..")
-                    uploadStatusMessage[type] += '\n adding records to the main UTME table'
-
-                    await addRecords(type,mainTableName[type], schoolType)
-                }
-
-                // closeConnection()
-                console.log("upload successful..")
-                uploadStatusMessage[type] += '\n upload successful'
-                time_taken_string[type] = await getTimeTaken(type);
-                uploadStatus[type] = 'success'
-                lastOpStat = await getStat(type)
-                // try {
-                //     await closeConnection()
-                //     uploadStatusMessage[type] = uploadStatusMessage[type] + '\closing the DB'
-                //
-                // } catch (error) {
-                //     console.log('db closing error', error)
-                // }
+                await getExcelData(type, req.files.file.data)
+                console.log("done reading excel..")
             } catch (error) {
-                uploadSuccess = false;
-                console.log("error writing to the database ..")
+                readExcel = false
+                console.log("error reading excel..")
+                return res.status(400).json({error: 'Error reading excel'});
             }
 
-        }
+            if (readExcel) {
+                try {
 
+                    // makeConnection()
+                    uploadStatus[type] = 'busy'
+                    uploadStatusMessage[type] = 'busy'
+                    try {
+                        await makeConnection()
+                        uploadStatusMessage[type] = uploadStatusMessage[type] + '\connecting to the DB'
 
+                    } catch (error) {
+                        console.log('db connection error', error)
+                        return res.status(400).json({error: 'Error db connection error'});
+                    }
 
-        try {
-            if (uploadSuccess) {
-                res.status(201).json({
-                    message: "utme candidate data processed successfully"
-                });
-                // uploadStatus[type] = 'ready'
+                    // check if temp table exists // delete if it exists
+                    if (await checkTableExists(tempTableName[type])) {
+                        console.log("deleting existing temp UTME table..")
+                        uploadStatusMessage[type] += '\n deleting existing temp UTME table'
+                        await deleteTable(tempTableName[type])
+                    }
+                    // create temp table
+                    uploadStatusMessage[type] += '\n create temp UTME table'
+                    console.log("create temp UTME table..")
+
+                    await createTable(type, tempTableName[type])
+                    if (tempUTME && tempUTME[type]) {
+                        console.log("adding records to the temp UTME table..")
+                        uploadStatusMessage[type] += '\n adding records to the temp UTME table'
+                        await addRecords(type, tempTableName[type], schoolType)
+                    }
+                    if (await checkTableExists(mainTableName[type])) {
+                        console.log("adding records to the main UTME table..")
+                        uploadStatusMessage[type] += '\n adding records to the main UTME table'
+                        await matchUTMECandidateHash(type, mainTableName[type], tempTableName[type], schoolType)
+                    } else {
+                        await createTable(mainTableName[type])
+                        console.log("adding records to the main UTME table..")
+                        uploadStatusMessage[type] += '\n adding records to the main UTME table'
+
+                        await addRecords(type, mainTableName[type], schoolType)
+                    }
+
+                    // closeConnection()
+                    console.log("upload successful..")
+                    uploadStatusMessage[type] += '\n upload successful'
+                    time_taken_string[type] = await getTimeTaken(type);
+                    uploadStatus[type] = 'success'
+                    lastOpStat = await getStat(type)
+                    // try {
+                    //     await closeConnection()
+                    //     uploadStatusMessage[type] = uploadStatusMessage[type] + '\closing the DB'
+                    //
+                    // } catch (error) {
+                    //     console.log('db closing error', error)
+                    // }
+                } catch (error) {
+                    uploadSuccess = false;
+                    console.log("error writing to the database ..")
+                }
+
             }
-            else {
+
+
+            try {
+                if (uploadSuccess) {
+                    res.status(201).json({
+                        message: "utme candidate data processed successfully"
+                    });
+                    // uploadStatus[type] = 'ready'
+                } else {
+                    res.status(500).json({
+                            message: "Error during processing",
+                        }
+                    );
+                    uploadStatus[type] = 'ready'
+                }
+
+            } catch (error) {
                 res.status(500).json({
                         message: "Error during processing",
                     }
-
                 );
                 uploadStatus[type] = 'ready'
+
             }
-
-        } catch (error) {
-            res.status(500).json({
-                    message: "Error during processing",
-                }
-
-            );
-            uploadStatus[type] = 'ready'
-
         }
     }
-
+    else {
+        res.status(404).json({ message: 'Version not found' });
+    }
 
 
 
 
 }
+
+
+
+
+
+
 async function onFileupload2(req, res) {
     let type ='UTME'
     let schoolType = type;
@@ -1822,91 +1871,98 @@ async function onFileupload2(req, res) {
 
 }
 
-app.route('/api/uploaddecandidate').post(onFileuploadDE)
+app.route('/api/:version/uploaddecandidate').post(onFileuploadDE)
 async function onFileuploadDE(req, res) {
-    let type ='DE'
-    let schoolType = req.body.type
-    console.log("IN DE")
+    if (parseInt(req.version) === 2) {
+        let type = 'DE'
+        let schoolType = req.body.type
+        console.log("IN DE")
 
-    if (uploadStatus[type] !== 'ready' && uploadStatus[type] !== 'success') {
-        res.status(204).json({
-            message: "An upload operation is still ongoing. Try again later",
-        });
+        if (uploadStatus[type] !== 'ready' && uploadStatus[type] !== 'success') {
+            res.status(204).json({
+                message: "An upload operation is still ongoing. Try again later",
+            });
+        } else {
+            resetVariables(type)
+
+
+            // for each record in the temp table
+            // hash that record h1
+            // get the corresponding record on the main table
+            // hash the main table record, h2
+            // if h1 === h2 skip else replace main table record with temp table record
+
+
+            // await getExcelData(type, req.files.file.data)
+            try {
+                await getExcelData(type, req.files.file.data)
+                console.log("done reading excel..")
+            } catch (error) {
+                // readExcel = false
+                console.log("error reading excel..")
+                return res.status(400).json({error: 'Error reading excel'});
+            }
+
+
+            try {
+                await makeConnection()
+                uploadStatusMessage[type] = uploadStatusMessage[type] + '\connecting to the DB'
+
+            } catch (error) {
+                console.log('db connection error', error)
+                return res.status(400).json({error: 'Error db connection error'});
+            }
+
+
+            // check if temp table exists // delete if it exists
+            if (await checkTableExists(tempTableName[type])) {
+                await deleteTable(tempTableName[type])
+            }
+            // create temp table
+            console.log("IN DE- after check if temp table exists")
+
+            const crttblResult = await createTable(type, tempTableName[type])
+            // console.log('create table result::', crttblResult)
+            if (tempUTME && tempUTME[type]) {
+                // console.log('records to add::',tempUTME[type] )
+                await addRecords(type, tempTableName[type], schoolType)
+            }
+            if (await checkTableExists(mainTableName[type])) {
+                await matchUTMECandidateHash(type, mainTableName[type], tempTableName[type], schoolType)
+            } else {
+                await createTable(type, mainTableName[type])
+                await addRecords(type, mainTableName[type], schoolType)
+            }
+            console.log("IN DE- after check if main table exists")
+
+            // try {
+            //     await closeConnection()
+            //     uploadStatusMessage[type] = uploadStatusMessage[type] + '\closing the DB'
+            //
+            // } catch (error) {
+            //     console.log('db closing error', error)
+            // }
+
+            time_taken_string[type] = await getTimeTaken(type);
+            uploadStatus[type] = 'success'
+            lastOpStat = await getStat(type)
+
+
+            try {
+                res.status(201).json({
+                    message: "DE candidate data processed successfully"
+                });
+            } catch (error) {
+                res.status(500).json({
+                    message: "Error during processing",
+                });
+            }
+        }
+
     }
-
     else {
-        resetVariables(type)
-
-
-
-
-        
-        // for each record in the temp table
-        // hash that record h1
-        // get the corresponding record on the main table
-        // hash the main table record, h2
-        // if h1 === h2 skip else replace main table record with temp table record
-
-
-        await getExcelData(type, req.files.file.data)
-
-
-        try {
-            await makeConnection()
-            uploadStatusMessage[type] = uploadStatusMessage[type] + '\connecting to the DB'
-            
-        } catch (error) {
-            console.log('db connection error', error)
-        }
-
-
-        // check if temp table exists // delete if it exists
-        if (await checkTableExists(tempTableName[type])) {await deleteTable(tempTableName[type])}
-        // create temp table
-        console.log("IN DE- after check if temp table exists")
-
-        const crttblResult = await createTable(type,tempTableName[type])
-        // console.log('create table result::', crttblResult)
-        if (tempUTME && tempUTME[type]) {
-            // console.log('records to add::',tempUTME[type] )
-            await addRecords(type,tempTableName[type], schoolType)
-        }
-        if (await checkTableExists(mainTableName[type])) {
-            await matchUTMECandidateHash(type,mainTableName[type], tempTableName[type], schoolType)
-        }
-
-
-        else {
-            await createTable(type,mainTableName[type])
-            await addRecords(type, mainTableName[type], schoolType)
-        }
-        console.log("IN DE- after check if main table exists")
-
-        // try {
-        //     await closeConnection()
-        //     uploadStatusMessage[type] = uploadStatusMessage[type] + '\closing the DB'
-        //
-        // } catch (error) {
-        //     console.log('db closing error', error)
-        // }
-
-        time_taken_string[type] = await getTimeTaken(type);
-        uploadStatus[type] = 'success'
-        lastOpStat = await getStat(type)
-
-
-        try {
-            res.status(201).json({
-                message: "DE candidate data processed successfully"
-            });
-        } catch (error) {
-            res.status(500).json({
-                message: "Error during processing",
-            });
-        }
+        res.status(404).json({ message: 'Version not found' });
     }
-
-
 
 }
 
@@ -2126,87 +2182,104 @@ async function onCandidateRegistration(req, res) {
     }
 }
 
-app.route('/api/check-valid-regno2').get(onStudenRecordGet2)
+app.route('/api/:version/check-valid-regno2').get(onStudenRecordGet2)
 async function onStudenRecordGet2(req, res) {
-    const type = 'UTME'
-    const regNo = req.query.regNo
-    console.log('...received request to grab student info')
-    console.log('...received request type = ', req.query.type)
-    // const tableName = ""
-    // console.log('received regno to query:::', req.query.regNo)
-    const r1 = await recordsFromATableGrab(type,regNo, mainTableName[type],true)
-    // console.log('retrieved No:::', req.query.regNo)
-    console.log('...retrieved student record')
 
-    // console.log('retrieved record:::', r1)
-    try {
-        const toSend = r1.length < 1  ? undefined : r1
-        // console.log('toSend', toSend)
-        if (toSend) {
-            res.status(200).json({
-                studentRecord: toSend, status: 200
+    if (parseInt(req.version) === 1 || parseInt(req.version) === 2) {
+        const version = parseInt(req.version);
+        // const version = req.version;
+        const type = 'UTME'
+        const regNo = req.query.regNo
+        console.log('...received request to grab student info')
+        console.log('...received request type = ', req.query.type)
+        // const tableName = ""
+        // console.log('received regno to query:::', req.query.regNo)
+        const r1 = await recordsFromATableGrab(type, regNo, (version === 1 ? testmainTableName[type]: mainTableName[type]), true)
+        // console.log('retrieved No:::', req.query.regNo)
+        console.log('...retrieved student record')
+
+        console.log('retrieved record:::', r1)
+        try {
+            const toSend = r1.length < 1 ? undefined : r1
+            // console.log('toSend', toSend)
+            if (toSend) {
+                res.status(200).json({
+                    studentRecord: toSend, status: 200
+                });
+            } else {
+                res.status(202).json({
+                    studentRecord: toSend, status: 202
+                });
+            }
+
+        } catch (error) {
+            res.status(500).json({
+                message: "Failed to retrieve record",
             });
         }
-        else {
-            res.status(202).json({
-                studentRecord: toSend, status: 202
-            });
-        }
-
-    } catch (error) {
-        res.status(500).json({
-            message: "Failed to retrieve record",
-        });
     }
-}
-
-app.route('/api/check-valid-regno3').get(onStudenRecordGet3)
-async function onStudenRecordGet3(req, res) {
-    const type = 'UTME'
-    const regNo = req.query.regNo
-    const lga = req.query.lga
-    const c1 = req.query.c1
-    const c2 = req.query.c2
-    const c3 = req.query.c3
-    const r1 = []
-    console.log('...received request to grab student info')
-    console.log('...received request type = ', req.query.type)
-    // const tableName = ""
-    // console.log('received regno to query:::', req.query.regNo)
-    if (c1 && c2 && c3 && lga) { r1.push(await protectedRecordFromATableGrab(type,regNo, mainTableName[type], lga,[c1,c2,c3])) }
     else {
-        r1.push(await protectedRecordFromATableGrab(type,regNo, mainTableName[type]))
-
+        res.status(404).json({ message: 'Version not found' });
     }
+}
 
-    // console.log('retrieved No:::', req.query.regNo)
-    // console.log('...retrieved student record::' , r1[0])
+app.route('/api/:version/check-valid-regno3').get(onStudenRecordGet3)
+async function onStudenRecordGet3(req, res) {
+    if (parseInt(req.version) === 1 || parseInt(req.version) === 2) {
+        const version = parseInt(req.version);
+        const type = req.query.type;
+        const regNo = req.query.regNo
+        const lga = req.query.lga
+        const c1 = req.query.c1
+        const c2 = req.query.c2
+        const c3 = req.query.c3
+        const r1 = []
+        console.log('...received request to grab student info')
+        console.log('...received request type = ', req.query.type)// const tableName = ""
+        // console.log('received regno to query:::', req.query.regNo)
+        const tableName = (version === 1 ? testmainTableName[type]: mainTableName[type])
+        console.log({tableName});
+        if (c1 && c2 && c3 && lga) {
 
-    // console.log('retrieved record:::', r1)
-    try {
-        const toSend = r1[0].length < 1  ? undefined : r1[0]
-        // console.log('toSend', toSend)
-        if (toSend) {
-            res.status(200).json({
-                studentRecord: toSend, status: 200
+            r1.push(await protectedRecordFromATableGrab(type, regNo, tableName, lga, [c1, c2, c3]))
+        } else if (lga && type === "DE") {
+            r1.push(await protectedRecordFromATableGrab(type, regNo, tableName, lga));
+        } else {
+            r1.push(await protectedRecordFromATableGrab(type, regNo, tableName))
+
+        }
+
+        // console.log('retrieved No:::', req.query.regNo)
+        // console.log('...retrieved student record::' , r1[0])
+
+        console.log('retrieved record:::', r1)
+        try {
+            const toSend = r1[0].length < 1 ? undefined : r1[0]
+            // console.log('toSend', toSend)
+            if (toSend) {
+                res.status(200).json({
+                    studentRecord: toSend, status: 200
+                });
+            } else {
+                res.status(202).json({
+                    studentRecord: toSend, status: 202
+                });
+            }
+
+        } catch (error) {
+            res.status(500).json({
+                message: "Failed to retrieve record",
             });
         }
-        else {
-            res.status(202).json({
-                studentRecord: toSend, status: 202
-            });
-        }
-
-    } catch (error) {
-        res.status(500).json({
-            message: "Failed to retrieve record",
-        });
+    }
+    else {
+        res.status(404).json({ message: 'Version not found' });
     }
 }
 
 
 
-app.route('/api/get-utme-subj').get(getSubjects)
+app.route('/api/:version/get-utme-subj').get(getSubjects)
 async function getSubjects(req, res) {
     // const type = 'UTME'
     // const regNo = req.query.regNo
@@ -2243,46 +2316,51 @@ async function getSubjects(req, res) {
     }
 }
 
-app.route('/api/get-lga').get(getLga)
+app.route('/api/:version/get-lga').get(getLga)
 async function getLga(req, res) {
-    // const type = 'UTME'
-    const type = req.query.type
-    console.log('...received request to grab all lgas')
-    // console.log('...received request type = ', req.query.type)
-    // const tableName = ""
-    // console.log('received regno to query:::', req.query.regNo)
-    const r1 = await lgaFromATableGrab(type,mainTableName[type])
+    if (parseInt(req.version) === 1 || parseInt(req.version) === 2) {
+        // const type = 'UTME'
+        const version = parseInt(req.version);
+        const type = req.query.type
+        console.log('...received request to grab all lgas')
+        // console.log('...received request type = ', req.query.type)
+        const tableName = (version === 1 ? testmainTableName[type]: mainTableName[type])
+        // console.log('received regno to query:::', req.query.regNo)
+        const r1 = await lgaFromATableGrab(type, tableName);
 
-    // console.log('retrieved No:::', req.query.regNo)
-    // const allValues = Object.values(course_dict);
-    // console.log(allValues);
-    // console.log('...retrieved student record')
+        // console.log('retrieved No:::', req.query.regNo)
+        // const allValues = Object.values(course_dict);
+        // console.log(allValues);
+        // console.log('...retrieved student record')
 
-    // console.log('retrieved record:::', r1)
-    try {
-        const toSend = r1.length < 1  ? undefined : r1
-        const toSend2 = []
-        toSend.forEach(e => {
-            toSend2.push(e['lga'])
-        })
+        // console.log('retrieved record:::', r1)
+        try {
+            const toSend = r1.length < 1 ? undefined : r1
+            const toSend2 = []
+            toSend.forEach(e => {
+                toSend2.push(e['lga'])
+            })
 
-        // console.log('toSend', toSend)
-        if (toSend2) {
-            toSend2.sort()
-            res.status(200).json({
-                lga: toSend2, status: 200
+            // console.log('toSend', toSend)
+            if (toSend2) {
+                toSend2.sort()
+                res.status(200).json({
+                    lga: toSend2, status: 200
+                });
+            } else {
+                res.status(202).json({
+                    lga: toSend2, status: 202
+                });
+            }
+
+        } catch (error) {
+            res.status(500).json({
+                message: "Failed to retrieve lgas",
             });
         }
-        else {
-            res.status(202).json({
-                lga: toSend2, status: 202
-            });
-        }
-
-    } catch (error) {
-        res.status(500).json({
-            message: "Failed to retrieve lgas",
-        });
+    }
+    else {
+        res.status(404).json({ message: 'Version not found' });
     }
 }
 
@@ -3761,7 +3839,7 @@ async function onWhatIsSent(req, res) {
 
 // this api check to see if the student has passed the passmark and gets the student JAMB no details
 // input the JAMB regNo
-app.route('/api/check-valid-regno').get(onStudenRecordGet)
+app.route('/api/:version/check-valid-regno').get(onStudenRecordGet)
 async function onStudenRecordGet(req, res) {
     const type = "UTME"
     var message = ""
@@ -3903,7 +3981,7 @@ app.get('/api/match-eng-score', (req, res, next) => {})
 
 // app.get('/api/check-dept-cutoff', (req, res, next) => {})
 
-app.route('/api/check-dept-cutoff').get(onGetDepartmentCutOff)
+app.route('/api/:version/check-dept-cutoff').get(onGetDepartmentCutOff)
 async function onGetDepartmentCutOff(req, res) {
     const type = 'UTME'
     const department = req.query.department
@@ -3937,7 +4015,7 @@ async function onGetDepartmentCutOff(req, res) {
     }
 }
 
-app.route('/api/check-depts-cutoff').get(onGetDepartmentsCutOff)
+app.route('/api/:version/check-depts-cutoff').get(onGetDepartmentsCutOff)
 async function onGetDepartmentsCutOff(req, res) {
     const type = 'UTME'
 
@@ -3967,7 +4045,7 @@ async function onGetDepartmentsCutOff(req, res) {
     }
 }
 
-app.route('/api/get-admissionlist').get(onGetAdmissionList)
+app.route('/api/:version/get-admissionlist').get(onGetAdmissionList)
 async function onGetAdmissionList(req, res) {
     const type = 'UTME'
 
