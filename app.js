@@ -1601,7 +1601,7 @@ var batchCondition = [0,0,0]
 // })
 
 
-app.get('/api/:version/status', async (req, res, next) => {
+app.get('/api/:version/utility/status', async (req, res, next) => {
 // app.route('/api/status').get(onStatusQuery)
 // async function onStatusQuery(req, res) {
     console.log("request", req.query.type)
@@ -1643,7 +1643,7 @@ app.get('/api/:version/status', async (req, res, next) => {
     }
 })
 
-app.get('/api/:version/push-status', async (req, res, next) => {
+app.get('/api/:version/utility/push-status', async (req, res, next) => {
     // app.route('/api/status').get(onStatusQuery)
     // async function onStatusQuery(req, res) {
         console.log("request", req.query.type)
@@ -1872,7 +1872,7 @@ async function onFileupload2(req, res) {
 
 }
 
-app.route('/api/:version/uploaddecandidate').post(onFileuploadDE)
+app.route('/api/:version/de/uploaddecandidate').post(onFileuploadDE)
 async function onFileuploadDE(req, res) {
     if (parseInt(req.version) === 2) {
         let type = 'DE'
