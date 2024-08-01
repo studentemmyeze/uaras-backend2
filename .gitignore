@@ -6,3 +6,8 @@
 /singleton1
 /db
 /auth
+app1.js
+auth.js
+db.js
+singleton.js
+singleton1.js

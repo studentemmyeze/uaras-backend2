@@ -19,10 +19,10 @@ const { type } = require('os');
 require('dotenv/config');
 const {NULL} = require("mysql/lib/protocol/constants/types");
 
-
+const port = 3003;
 const app = express();
-app.listen(3000,()=> {
-    console.log('server is running @ !');
+app.listen(port,()=> {
+    console.log('@uaras-db server is running @ !');
 })
 
 // Middleware to handle versioning
@@ -38,7 +38,7 @@ app.use(morgan('tiny'));
 app.use(apiVersioning);
 app.use((err,req,res,next) => {
     console.log(err)
-    res.status(err.status || 500).send("Something went wrong!")
+    res.status(err.status || 500).send("@uaras-db Something went wrong!")
 })
 
 // host = process.env.HOST;
@@ -1601,7 +1601,7 @@ var batchCondition = [0,0,0]
 // })
 
 
-app.get('/api/:version/utility/status', async (req, res, next) => {
+app.get('/api/:version/status', async (req, res, next) => {
 // app.route('/api/status').get(onStatusQuery)
 // async function onStatusQuery(req, res) {
     console.log("request", req.query.type)
@@ -1643,7 +1643,7 @@ app.get('/api/:version/utility/status', async (req, res, next) => {
     }
 })
 
-app.get('/api/:version/utility/push-status', async (req, res, next) => {
+app.get('/api/:version/push-status', async (req, res, next) => {
     // app.route('/api/status').get(onStatusQuery)
     // async function onStatusQuery(req, res) {
         console.log("request", req.query.type)
@@ -1687,7 +1687,7 @@ app.get('/api/:version/utility/push-status', async (req, res, next) => {
     
 
 // endpoint for xlsx upload-receive Uploaded UTME
-app.route('/api/:version/utme/uploadutme').post(onFileupload)
+app.route('/api/:version/uploadutme').post(onFileupload)
 
 async function onFileupload(req, res) {
     if (parseInt(req.version) === 2) {
