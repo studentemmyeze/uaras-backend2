@@ -28,6 +28,7 @@ app.listen(port,()=> {
 // Middleware to handle versioning
 function apiVersioning(req, res, next) {
     const version = req.url.split('/')[2]; // Extract version from URL
+    console.log(version)
     req.version = version[1] || '1'; // Default to version 1
     next();
 }
@@ -670,13 +671,14 @@ async function matchUTMECandidateHash(type,tableName, tempTableName, schoolType=
     for (let i = 0; i < tempUTME[type].length; i++) {
         // for (let i = 0; i < 25; i++) {
 
-        const r1 = await recordsFromATableGrab(type,tempUTME[type][i].RG_NUM, tableName, true)
+        const r1 = await recordsFromATableGrab(type,tempUTME[type][i].RG_NUM, tableName, false)
         // console.log('..record grabbed ', r1)
         if (r1.length > 0) { // the record has been entered into the main table before
-            const r2 = await recordsFromATableGrab(type,tempUTME[type][i].RG_NUM, tempTableName, true)
+            const r2 = await recordsFromATableGrab(type,tempUTME[type][i].RG_NUM, tempTableName, false)
             const h1 = crypto.createHash('sha1').update(`${JSON.stringify(r1[0])}`).digest('hex')
             const h2 = crypto.createHash('sha1').update(`${JSON.stringify(r2[0])}`).digest('hex')
             if (h1 !== h2) {
+                console.log("NOT EQUAL!")
                 try {
                     await updateStudentRecord(type,tableName, i, schoolType)
                     updatedData[type].push(tempUTME[type][i])
