@@ -11,13 +11,13 @@ const https = require('https');
 const reader = require('xlsx')
 const crypto = require('crypto')
 const fileUpload = require('express-fileupload');
-const mysql = require('mysql');
+const mysql = require('mysql2');
 // const morgan = require('morgan')
 const fetch = require('node-fetch');
 var fs = require('fs');
 const { type } = require('os');
 require('dotenv/config');
-const {NULL} = require("mysql/lib/protocol/constants/types");
+// const {NULL} = require("mysql/lib/protocol/constants/types");
 
 const port = 3003;
 const app = express();
