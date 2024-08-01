@@ -124,7 +124,7 @@ const testmainTableName = {
     "POSTSTATUS": 'uaras_saved_utme_candidate_status'
 };
 
-const tempTableName = {
+const testtempTableName = {
     "UTME":'test_uaras_temp_utme_candidates',
     "DE":'test_uaras_temp_de_candidates',
     "PRE":'uaras_temp_prescience_candidates',
@@ -134,7 +134,7 @@ const tempTableName = {
     "PASSMK": 'uaras_utme_passmark'
 }
 
-const testtempTableName = {
+const tempTableName = {
     "UTME":'uaras_temp_utme_candidates',
     "DE":'uaras_temp_de_candidates',
     "PRE":'uaras_temp_prescience_candidates',
